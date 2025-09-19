@@ -1,0 +1,69 @@
+{
+  "name": "typisttech/composer-semver-cli",
+  "description": "TODO!",
+  "license": "MIT",
+  "type": "project",
+  "keywords": [
+    "cli",
+    "semver",
+    "semantic",
+    "versioning",
+    "validation"
+  ],
+  "authors": [
+    {
+      "name": "Typist Tech",
+      "homepage": "https://typist.tech"
+    },
+    {
+      "name": "Tang Rufus",
+      "email": "tangrufus@gmail.com",
+      "homepage": "https://tangrufus.com",
+      "role": "Developer"
+    }
+  ],
+  "homepage": "https://github.com/typisttech/composer-semver-cli",
+  "support": {
+    "issues": "https://github.com/typisttech/composer-semver-cli/issues",
+    "source": "https://github.com/typisttech/composer-semver-cli"
+  },
+  "require": {
+    "php": "^8.4",
+    "composer/semver": "^3.4",
+    "symfony/console": "^7.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "TypistTech\\ComposerSemVer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "bin": [
+    "bin/composer-semver"
+  ],
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "phpstan/extension-installer": true
+    }
+  },
+  "replace": {
+    "symfony/polyfill-ctype": "*",
+    "symfony/polyfill-intl-grapheme":"*",
+    "symfony/polyfill-intl-normalizer": "*",
+    "symfony/polyfill-mbstring": "*"
+  },
+  "require-dev": {
+    "pestphp/pest": "^4.1",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-deprecation-rules": "^2.0",
+    "phpstan/phpstan-strict-rules": "^2.0",
+    "phpstan/phpstan-symfony": "^2.0"
+  }
+}
