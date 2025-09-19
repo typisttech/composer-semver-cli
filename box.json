@@ -1,0 +1,4 @@
+{
+  "output": "phar/composer-semver.phar",
+  "check-requirements": false
+}
