@@ -28,7 +28,7 @@
     "source": "https://github.com/typisttech/composer-semver-cli"
   },
   "require": {
-    "php": "^8.4",
+    "php": "~8.4.12",
     "composer/semver": "^3.4",
     "symfony/console": "^7.3"
   },
@@ -53,12 +53,6 @@
     },
     "platform-check": false
   },
-  "replace": {
-    "symfony/polyfill-ctype": "*",
-    "symfony/polyfill-intl-grapheme":"*",
-    "symfony/polyfill-intl-normalizer": "*",
-    "symfony/polyfill-mbstring": "*"
-  },
   "require-dev": {
     "pestphp/pest": "^4.1",
     "phpstan/extension-installer": "^1.4",
@@ -73,7 +67,15 @@
       "@composer reinstall --prefer-dist '*'",
       "box compile",
       "box verify phar/composer-semver.phar",
-      "box info phar/composer-semver.phar"
+      "box info phar/composer-semver.phar",
+      "@php phar/composer-semver.phar info"
+    ],
+    "compile": [
+      "@phar",
+      "spc craft",
+      "mkdir -p out",
+      "spc micro:combine phar/composer-semver.phar --output out/composer-semver",
+      "out/composer-semver info"
     ]
   }
 }

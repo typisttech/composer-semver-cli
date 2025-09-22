@@ -9,17 +9,21 @@ use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 
 class Application
 {
-    public static function make(): SymfonyConsoleApplication
+    public static function run(): int
     {
-        $app = new SymfonyConsoleApplication('Composer SemVer', '0.1.0');
+        $name = 'Composer SemVer';
+        $version = '0.1.0-dev';
+
+        $app = new SymfonyConsoleApplication($name, $version);
 
         $parser = new VersionParser;
 
         $app->addCommands([
             new NormalizeCommand($parser),
             new ParseCommand($parser),
+            new InfoCommand($name, $version),
         ]);
 
-        return $app;
+        return $app->run();
     }
 }
