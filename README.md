@@ -37,10 +37,12 @@ TODO!
 
 ## Credits
 
-[`Composer SemVer CLI`](https://github.com/typisttech/composer-semver-cli) is a [Typist Tech](https://typist.tech) project and
-maintained by [Tang Rufus](https://x.com/TangRufus), freelance developer [for hire](https://typist.tech/contact/).
+[`Composer SemVer CLI`](https://github.com/typisttech/composer-semver-cli) is a [Typist Tech](https://typist.tech)
+project and maintained by [Tang Rufus](https://x.com/TangRufus), freelance
+developer [for hire](https://typist.tech/contact/).
 
-Full list of contributors can be found [on GitHub](https://github.com/typisttech/composer-semver-cli/graphs/contributors).
+Full list of contributors can be
+found [on GitHub](https://github.com/typisttech/composer-semver-cli/graphs/contributors).
 
 ## Copyright and License
 

@@ -16,7 +16,7 @@ class Application
 
         $app = new SymfonyConsoleApplication($name, $version);
 
-        $parser = new VersionParser;
+        $parser = new VersionParser();
 
         $app->addCommands([
             new NormalizeCommand($parser),

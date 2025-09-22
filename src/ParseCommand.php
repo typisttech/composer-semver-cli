@@ -17,14 +17,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ParseCommand extends Command
 {
     public function __construct(
-        public readonly VersionParser $parser = new VersionParser,
+        public readonly VersionParser $parser = new VersionParser(),
     ) {
         parent::__construct();
     }
 
     public function __invoke(
         SymfonyStyle $io,
-        #[Argument] string $constraints,
+        #[Argument]
+        string $constraints,
     ): int {
         try {
             $parsed = $this->parser->parseConstraints($constraints);
@@ -34,9 +35,10 @@ class ParseCommand extends Command
 
             return Command::SUCCESS;
         } catch (\UnexpectedValueException $e) {
-            $io->getErrorStyle()
+            $io
+                ->getErrorStyle()
                 ->error(
-                    $e->getMessage()
+                    $e->getMessage(),
                 );
 
             return Command::FAILURE;

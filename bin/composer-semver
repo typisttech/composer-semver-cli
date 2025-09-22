@@ -7,6 +7,6 @@ use TypistTech\ComposerSemVer\Application;
 
 // TODO https://box-project.github.io/box/faq/#what-is-the-canonical-way-to-write-a-cli-entry-file
 
-include $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
+include $_composer_autoload_path ?? __DIR__.'/../vendor/autoload.php';
 
 Application::run();

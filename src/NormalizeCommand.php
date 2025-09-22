@@ -18,15 +18,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class NormalizeCommand extends Command
 {
     public function __construct(
-        public readonly VersionParser $parser = new VersionParser,
+        public readonly VersionParser $parser = new VersionParser(),
     ) {
         parent::__construct();
     }
 
     public function __invoke(
         SymfonyStyle $io,
-        #[Argument] string $version,
-        #[Option(description: 'Complete version string to give more context.')] ?string $fullVersion = null,
+        #[Argument]
+        string $version,
+        #[Option(description: 'Complete version string to give more context.')]
+        ?string $fullVersion = null,
     ): int {
         try {
             $normalized = $this->parser->normalize($version, $fullVersion);
@@ -34,9 +36,10 @@ class NormalizeCommand extends Command
 
             return Command::SUCCESS;
         } catch (\UnexpectedValueException $e) {
-            $io->getErrorStyle()
+            $io
+                ->getErrorStyle()
                 ->error(
-                    $e->getMessage()
+                    $e->getMessage(),
                 );
 
             return Command::FAILURE;
