@@ -30,7 +30,7 @@ type txtarWriter interface {
 	Write(f *os.File) error
 }
 
-func Gen[T txtarWriter](initiator, dir string, cases ...T) error {
+func Generate[T txtarWriter](initiator, dir string, cases ...T) error {
 	os.Stdout.Write([]byte("\n==> Running " + initiator + "\n"))
 
 	d, err := ensureDirEmpty(dir)
