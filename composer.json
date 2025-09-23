@@ -37,24 +37,17 @@
       "TypistTech\\ComposerSemVer\\": "src/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "Tests\\": "tests/"
-    }
-  },
   "bin": [
     "bin/composer-semver"
   ],
   "config": {
     "sort-packages": true,
     "allow-plugins": {
-      "pestphp/pest-plugin": true,
       "phpstan/extension-installer": true
     },
     "platform-check": false
   },
   "require-dev": {
-    "pestphp/pest": "^4.1",
     "phpstan/extension-installer": "^1.4",
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -66,15 +59,15 @@
       "@composer install --no-dev --prefer-dist",
       "@composer reinstall --prefer-dist '*'",
       "box compile",
-      "box verify phar/composer-semver.phar",
-      "box info phar/composer-semver.phar",
-      "@php phar/composer-semver.phar info"
+      "box verify phar/composer-semver",
+      "box info phar/composer-semver",
+      "@php phar/composer-semver info"
     ],
     "compile": [
       "@phar",
       "spc craft",
       "mkdir -p out",
-      "spc micro:combine phar/composer-semver.phar --output out/composer-semver",
+      "spc micro:combine phar/composer-semver --output out/composer-semver",
       "out/composer-semver info"
     ]
   }
