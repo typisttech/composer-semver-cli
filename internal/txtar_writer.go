@@ -13,7 +13,7 @@ type txtarWriter interface {
 func Generate[T txtarWriter](name string, cases ...T) error {
 	os.Stdout.Write([]byte("\n==> Generating " + name + " scripts\n\n"))
 
-	dir, err := filepath.Abs("testdata/scripts")
+	dir, err := filepath.Abs("testdata")
 	if err != nil {
 		return err
 	}

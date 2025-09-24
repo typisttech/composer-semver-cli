@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/typisttech/composer-semver-cli/internal"
 	"os"
 	"regexp"
 	"text/template"
+
+	"github.com/typisttech/composer-semver-cli/internal"
 )
 
 const fileTemplateRaw = `# Test the "{{ .Name }}" case
