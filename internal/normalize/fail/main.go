@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -59,10 +60,13 @@ func (d data) Name() string {
 	return d.name
 }
 
+const errMsg = `[ERROR] Invalid version string "%s"`
+
 func (d data) Output() string {
-	s := strings.Trim(d.Input, ` `)
-	q := regexp.QuoteMeta(`[ERROR] Invalid version string "` + s + `"`)
-	return `\s+` + q + `\s+`
+	v := strings.Trim(d.Input, ` `)
+	s := fmt.Sprintf(errMsg, v)
+	q := regexp.QuoteMeta(s)
+	return fmt.Sprintf(`\s+%s\s+`, q)
 }
 
 func (d data) Write(f *os.File) error {
