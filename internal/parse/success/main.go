@@ -138,6 +138,31 @@ var cases = []data{
 	{"hyphen/12", "2.0.x-dev - 3.0.x-dev", "[>= 2.0.9999999.9999999-dev <= 3.0.9999999.9999999-dev]"},
 	{"hyphen/13", "2.x-dev - 3.x-dev", "[>= 2.9999999.9999999.9999999-dev <= 3.9999999.9999999.9999999-dev]"},
 	{"hyphen/14", "0.x-dev - 1.x-dev", "[>= 0.9999999.9999999.9999999-dev <= 1.9999999.9999999.9999999-dev]"},
+
+	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L575-L608
+	{"numeric/1", "3.x-dev", "== 3.9999999.9999999.9999999-dev"},
+	{"numeric/2", "3-dev", "== 3.0.0.0-dev"},
+	{"non-numeric/1", "dev-3.x", "== dev-3.x"},
+	{"non-numeric/2", "xsd2php-dev", "== dev-xsd2php"},
+	{"non-numeric/3", "3.next-dev", "== dev-3.next"},
+	{"non-numeric/4", "foobar-dev", "== dev-foobar"},
+	{"non-numeric/5", "dev-xsd2php", "== dev-xsd2php"},
+	{"non-numeric/6", "dev-3.next", "== dev-3.next"},
+	{"non-numeric/7", "dev-foobar", "== dev-foobar"},
+	{"non-numeric/8", "dev-1.0.0-dev<1.0.5-dev", "== dev-1.0.0-dev<1.0.5-dev"},
+	{"non-numeric/9", "dev-1.0.0-dev<1.0.5", "== dev-1.0.0-dev<1.0.5"},
+	{"non-numeric/10", "foobar-dev as 2.1.0", "== dev-foobar"},
+	{"non-numeric/11", "foobar-dev as 2.1.0 || 3.5", "[== dev-foobar || == 3.5.0.0]"},
+	{"non-numeric/12", "foobar-dev as 2.1.0 || 3.5 as 1.5", "[== dev-foobar || == 3.5.0.0]"},
+	{"non-numeric/13", "2.1.0 - 2.3-dev", "[>= 2.1.0.0-dev <= 2.3.0.0-dev]"},
+	{"non-numeric/14", "1.0 - 2.0.x-dev", "[>= 1.0.0.0-dev <= 2.0.9999999.9999999-dev]"},
+	{"typo/1", "^1.", "[>= 1.0.0.0-dev < 2.0.0.0-dev]"},
+	{"typo/2", "~1.", "[>= 1.0.0.0-dev < 2.0.0.0-dev]"},
+	{"typo/3", "1.2.", "== 1.2.0.0"},
+	{"typo/4", "1.2..dev", "== 1.2.0.0-dev"},
+	{"typo/5", "1.2-.dev", "== 1.2.0.0-dev"},
+	{"typo/6", "1.2_-dev", "== 1.2.0.0-dev"},
+	{"complex", "~2.5.9|~2.6,>=2.6.2", "[[>= 2.5.9.0-dev < 2.6.0.0-dev] || [>= 2.6.0.0-dev < 3.0.0.0-dev >= 2.6.2.0-dev]]"},
 }
 
 var fileTemplate = template.Must(template.New("").Parse(fileTemplateRaw))
