@@ -27,6 +27,39 @@ var cases = []data{
 	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L302-L308
 	{"ignores reference on dev version 1", "1.0.x-dev#abcd123", "== 1.0.9999999.9999999-dev"},
 	{"ignores reference on dev version 2", "1.0.x-dev#trunk/@123", "== 1.0.9999999.9999999-dev"},
+
+	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L342-L377
+	{"match any", "*", "*"},
+	{"match any/v", "v*", ">= 0.0.0.0-dev"},
+	{"match any/2", "*.*", ">= 0.0.0.0-dev"},
+	{"match any/2v", "v*.*", ">= 0.0.0.0-dev"},
+	{"match any/3", "*.x.*", ">= 0.0.0.0-dev"},
+	{"match any/4", "x.X.x.*", ">= 0.0.0.0-dev"},
+	{"not equal", "<>1.0.0", "!= 1.0.0.0"},
+	{"not equal/2", "!=1.0.0", "!= 1.0.0.0"},
+	{"greater than", ">1.0.0", "> 1.0.0.0"},
+	{"lesser than", "<1.2.3.4", "< 1.2.3.4-dev"},
+	{"less/eq than", "<=1.2.3", "<= 1.2.3.0"},
+	{"great/eq than", ">=1.2.3", ">= 1.2.3.0-dev"},
+	{"equals", "=1.2.3", "== 1.2.3.0"},
+	{"double equals", "==1.2.3", "== 1.2.3.0"},
+	{"no op means eq", "1.2.3", "== 1.2.3.0"},
+	{"completes version", "=1.0", "== 1.0.0.0"},
+	{"shorthand beta", "1.2.3b5", "== 1.2.3.0-beta5"},
+	{"shorthand alpha", "1.2.3a1", "== 1.2.3.0-alpha1"},
+	{"shorthand patch", "1.2.3p1234", "== 1.2.3.0-patch1234"},
+	{"shorthand patch/2", "1.2.3pl1234", "== 1.2.3.0-patch1234"},
+	{"accepts spaces", ">= 1.2.3", ">= 1.2.3.0-dev"},
+	{"accepts spaces/2", "< 1.2.3", "< 1.2.3.0-dev"},
+	{"accepts spaces/3", "> 1.2.3", "> 1.2.3.0"},
+	{"accepts master", ">=dev-master", ">= dev-master"},
+	{"accepts master/2", "dev-master", "== dev-master"},
+	{"accepts arbitrary", "dev-feature-a", "== dev-feature-a"},
+	{"regression #550", "dev-some-fix", "== dev-some-fix"},
+	{"regression #935", "dev-CAPS", "== dev-CAPS"},
+	{"ignores aliases", "dev-master as 1.0.0", "== dev-master"},
+	{"lesser than override", "<1.2.3.4-stable", "< 1.2.3.4"},
+	{"great/eq than override", ">=1.2.3.4-stable", ">= 1.2.3.4"},
 }
 
 var fileTemplate = template.Must(template.New("").Parse(fileTemplateRaw))
@@ -42,7 +75,7 @@ func (d data) Name() string {
 }
 
 func (d data) Output() string {
-	return regexp.QuoteMeta(d.rawOutput)
+	return "^" + regexp.QuoteMeta(d.rawOutput) + "$"
 }
 
 func (d data) Write(f *os.File) error {
