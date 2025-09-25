@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"text/template"
@@ -107,7 +108,8 @@ func (d data) Name() string {
 }
 
 func (d data) Output() string {
-	return regexp.QuoteMeta(d.rawOutput)
+	q := regexp.QuoteMeta(d.rawOutput)
+	return fmt.Sprintf(`^%s$`, q)
 }
 
 func (d data) Write(f *os.File) error {
