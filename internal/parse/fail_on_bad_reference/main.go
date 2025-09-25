@@ -41,7 +41,7 @@ const errMsg = `[ERROR] Could not parse version constraint %s: Invalid version s
 func (d data) Output() string {
 	s := fmt.Sprintf(errMsg, d.Input, d.Input)
 	q := regexp.QuoteMeta(s)
-	return fmt.Sprintf(`\s+%s\s+`, q)
+	return fmt.Sprintf(`^\s+%s\s+$`, q)
 }
 
 func (d data) Write(f *os.File) error {

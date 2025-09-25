@@ -4,4 +4,4 @@
 
 ! exec composer-semver parse '1.0#trunk/@123'
 ! stdout .
-stderr '\s+\[ERROR\] Could not parse version constraint 1\.0#trunk/@123: Invalid version string "1\.0#trunk/@123"\s+'
+stderr '^\s+\[ERROR\] Could not parse version constraint 1\.0#trunk/@123: Invalid version string "1\.0#trunk/@123"\s+$'
