@@ -6,6 +6,7 @@ import (
 	"github.com/typisttech/composer-semver-cli/internal"
 )
 
+//go:generate go run ./main.go
 func Test(t *testing.T) {
 	internal.RunTestscript(t)
 }
