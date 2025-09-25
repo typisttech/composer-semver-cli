@@ -4,4 +4,4 @@
 
 ! exec composer-semver normalize '^8 || ^'
 ! stdout .
-stderr '\s+\[ERROR\] Invalid version string "\^8 \|\| \^"\s+'
+stderr '^\s+\[ERROR\] Invalid version string "\^8 \|\| \^"\s+$'

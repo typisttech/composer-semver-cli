@@ -4,4 +4,4 @@
 
 ! exec composer-semver normalize --full-version='<2.0 as 1.0.0+foo' '<2.0'
 ! stdout .
-stderr '\s+\[ERROR\] Invalid version string "<2\.0" in "<2\.0 as 1\.0\.0\+foo", the alias source must be an exact version, if\s+it is a\s+branch name you should prefix it with dev-\s+'
+stderr '^\s+\[ERROR\] Invalid version string "<2\.0" in "<2\.0 as 1\.0\.0\+foo", the alias source must be an exact version, if\s+it is a\s+branch name you should prefix it with dev-\s+$'

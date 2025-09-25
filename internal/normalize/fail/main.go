@@ -66,7 +66,7 @@ func (d data) Output() string {
 	v := strings.Trim(d.Input, ` `)
 	s := fmt.Sprintf(errMsg, v)
 	q := regexp.QuoteMeta(s)
-	return fmt.Sprintf(`\s+%s\s+`, q)
+	return fmt.Sprintf(`^\s+%s\s+$`, q)
 }
 
 func (d data) Write(f *os.File) error {

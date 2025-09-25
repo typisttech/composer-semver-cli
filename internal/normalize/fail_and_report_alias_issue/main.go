@@ -67,7 +67,7 @@ const errMsg = `[ERROR] Invalid version string "%s" in "%s", the alias must be a
 func (d data) Output() string {
 	s := fmt.Sprintf(errMsg, d.Alias(), d.FullVersion)
 	q := regexp.QuoteMeta(s)
-	return fmt.Sprintf(`\s+%s\s+`, q)
+	return fmt.Sprintf(`^\s+%s\s+$`, q)
 }
 
 func (d data) Write(f *os.File) error {

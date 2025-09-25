@@ -4,4 +4,4 @@
 
 ! exec composer-semver normalize '1.0 .2'
 ! stdout .
-stderr '\s+\[ERROR\] Invalid version string "1\.0 \.2"\s+'
+stderr '^\s+\[ERROR\] Invalid version string "1\.0 \.2"\s+$'
