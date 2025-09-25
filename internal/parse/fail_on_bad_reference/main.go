@@ -20,8 +20,8 @@ stderr '{{ .Output }}'
 
 var cases = []data{
 	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L310-L317
-	{"fail on bad reference 1", "1.0#abcd123", "== 1.0.0.0"},
-	{"fail on bad reference 2", "1.0#trunk/@123", "== 1.0.0.0"},
+	{"fail on bad reference/1", "1.0#abcd123", "== 1.0.0.0"},
+	{"fail on bad reference/2", "1.0#trunk/@123", "== 1.0.0.0"},
 }
 
 var fileTemplate = template.Must(template.New("").Parse(fileTemplateRaw))
