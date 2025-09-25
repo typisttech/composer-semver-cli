@@ -61,6 +61,22 @@ var cases = []data{
 	{"simple/ignores aliases", "dev-master as 1.0.0", "== dev-master"},
 	{"simple/lesser than override", "<1.2.3.4-stable", "< 1.2.3.4"},
 	{"simple/great/eq than override", ">=1.2.3.4-stable", ">= 1.2.3.4"},
+
+	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L401-L419
+	{"wildcard/1", "v2.*", "[>= 2.0.0.0-dev < 3.0.0.0-dev]"},
+	{"wildcard/2", "2.*.*", "[>= 2.0.0.0-dev < 3.0.0.0-dev]"},
+	{"wildcard/3", "20.*", "[>= 20.0.0.0-dev < 21.0.0.0-dev]"},
+	{"wildcard/4", "20.*.*", "[>= 20.0.0.0-dev < 21.0.0.0-dev]"},
+	{"wildcard/5", "2.0.*", "[>= 2.0.0.0-dev < 2.1.0.0-dev]"},
+	{"wildcard/6", "2.x", "[>= 2.0.0.0-dev < 3.0.0.0-dev]"},
+	{"wildcard/7", "2.x.x", "[>= 2.0.0.0-dev < 3.0.0.0-dev]"},
+	{"wildcard/8", "2.2.x", "[>= 2.2.0.0-dev < 2.3.0.0-dev]"},
+	{"wildcard/9", "2.10.X", "[>= 2.10.0.0-dev < 2.11.0.0-dev]"},
+	{"wildcard/10", "2.1.3.*", "[>= 2.1.3.0-dev < 2.1.4.0-dev]"},
+	{"wildcard/11", "0.*", "< 1.0.0.0-dev"},
+	{"wildcard/12", "0.*.*", "< 1.0.0.0-dev"},
+	{"wildcard/13", "0.x", "< 1.0.0.0-dev"},
+	{"wildcard/14", "0.x.x", "< 1.0.0.0-dev"},
 }
 
 var fileTemplate = template.Must(template.New("").Parse(fileTemplateRaw))
