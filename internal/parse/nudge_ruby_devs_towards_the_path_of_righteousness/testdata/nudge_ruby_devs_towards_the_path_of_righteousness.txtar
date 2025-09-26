@@ -13,3 +13,4 @@ cmp stderr stderr.golden
 -- .keep --
 Hack to ensure stderr.golden ends with a line break.
 Note that traling spaces are important for error message assertion.
+Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L319-L324

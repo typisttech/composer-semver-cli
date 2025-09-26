@@ -26,8 +26,8 @@ var cases = []data{
 	{"ignore stability flag/4", "dev-load-varnish-only-when-used@dev as ^2.0@dev", "== dev-load-varnish-only-when-used"},
 
 	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L302-L308
-	{"ignores reference on dev version/1", "1.0.x-dev#abcd123", "== 1.0.9999999.9999999-dev"},
-	{"ignores reference on dev version/2", "1.0.x-dev#trunk/@123", "== 1.0.9999999.9999999-dev"},
+	{"ignore reference on dev version/1", "1.0.x-dev#abcd123", "== 1.0.9999999.9999999-dev"},
+	{"ignore reference on dev version/2", "1.0.x-dev#trunk/@123", "== 1.0.9999999.9999999-dev"},
 
 	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L342-L377
 	{"simple/match any", "*", "*"},
