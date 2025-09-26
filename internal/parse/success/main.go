@@ -187,6 +187,12 @@ var cases = []data{
 
 	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L688-L696
 	{"multi with stabilities", ">2.0@stable,<=3.0@dev", "[> 2.0.0.0 <= 3.0.0.0-dev]"},
+
+	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L698-L706
+	{"multi with stabilities wildcard", "2.0@stable,@dev", "[== 2.0.0.0 *]"},
+
+	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L708-L716
+	{"multi with stabilities zero", ">2.0@stable || 0@dev", "[> 2.0.0.0 || == 0.0.0.0]"},
 }
 
 var fileTemplate = template.Must(template.New("").Parse(fileTemplateRaw))
