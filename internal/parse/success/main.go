@@ -179,6 +179,8 @@ var cases = []data{
 	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L643-L657
 	{"multi with stability suffix/1", ">=1.1.0-alpha4,<1.2.x-dev", "[>= 1.1.0.0-alpha4 < 1.2.9999999.9999999-dev]"},
 	{"multi with stability suffix/2", ">=1.1.0-alpha4,<1.2-beta2", "[>= 1.1.0.0-alpha4 < 1.2.0.0-beta2]"},
+
+	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L679-L686
 }
 
 var fileTemplate = template.Must(template.New("").Parse(fileTemplateRaw))
