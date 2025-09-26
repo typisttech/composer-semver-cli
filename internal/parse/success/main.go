@@ -181,6 +181,9 @@ var cases = []data{
 	{"multi with stability suffix/2", ">=1.1.0-alpha4,<1.2-beta2", "[>= 1.1.0.0-alpha4 < 1.2.0.0-beta2]"},
 
 	// Taken from https://github.com/composer/semver/blob/b52829022cb18210bb84e44e457bd4e890f8d2a7/tests/VersionParserTest.php#L679-L686
+	{"multi/2/1", ">2.0,<2.0.5 | >2.0.6", "[[> 2.0.0.0 < 2.0.5.0-dev] || > 2.0.6.0]"},
+	{"multi/2/2", ">2.0,<2.0.5 || >2.0.6", "[[> 2.0.0.0 < 2.0.5.0-dev] || > 2.0.6.0]"},
+	{"multi/2/3", "> 2.0 , <2.0.5 | >  2.0.6", "[[> 2.0.0.0 < 2.0.5.0-dev] || > 2.0.6.0]"},
 }
 
 var fileTemplate = template.Must(template.New("").Parse(fileTemplateRaw))
