@@ -61,15 +61,6 @@ jobs:
 
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: actions/download-artifact@v5
-        with:
-          name: composer-semver.phar
-          path: phar
-
-      - run: file "$WORKSPACE/phar/composer-semver"
-        env:
-          WORKSPACE: ${{ github.workspace }}
-
       - name: Download spc
         run: gh release download --repo crazywhalecc/static-php-cli --pattern "spc-$OS-$ARCH.tar.gz" --output spc.tar.gz
         env:
@@ -88,11 +79,19 @@ jobs:
             craft.yml
           sparse-checkout-cone-mode: false
 
-      - run: mkdir -p out
       - run: spc craft
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - run: ls -R && spc micro:combine "$WORKSPACE/phar/composer-semver" --output out/composer-semver --debug
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver.phar
+          path: phar
+      - run: file "$WORKSPACE/phar/composer-semver"
+        env:
+          WORKSPACE: ${{ github.workspace }}
+      - run: mkdir -p out
+      - run: spc micro:combine "$WORKSPACE/phar/composer-semver" --output out/composer-semver --debug
         env:
           WORKSPACE: ${{ github.workspace }}
 
