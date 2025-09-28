@@ -28,6 +28,8 @@ jobs:
           sparse-checkout-cone-mode: false
       - uses: typisttech/php-matrix-action@v1
         id: php-matrix
+        with:
+          mode: full
 
   phpstan:
     runs-on: ubuntu-latest
