@@ -91,10 +91,7 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: composer-semver.phar
-          path: phar/composer-semver
-
-      - run: ls -R phar
-      - run: ls -R phar/composer-semver
+          path: phar
 
       - run: mkdir -p out
       - run: spc craft
