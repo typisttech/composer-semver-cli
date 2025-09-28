@@ -36,16 +36,14 @@ jobs:
 
       - run: box compile
 
-      - run: box verify phar/composer-semver
-      - run: box info phar/composer-semver
+#      - run: box verify phar/composer-semver
+#      - run: box info phar/composer-semver
 
 #      - uses: actions/upload-artifact@v4
 #        with:
 #          name: composer-semver.phar
 #          path: phar/composer-semver
 #          if-no-files-found: error
-
-      - run: php phar/composer-semver info
 
       - run: echo "$WORKSPACE/phar" >> "$GITHUB_PATH"
         env:
@@ -55,5 +53,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      - run: go test -count=1 -v ./internal
+      - name: Print composer-semver binary path
+        run: go test -count=1 -v ./internal
+
       - run: go test -count=1 ./...

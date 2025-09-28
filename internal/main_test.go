@@ -11,5 +11,6 @@ func Test(t *testing.T) {
 		t.Error("Could not find composer-semver binary in PATH")
 		t.FailNow()
 	}
+
 	t.Logf("Found composer-semver binary at %s", p)
 }
