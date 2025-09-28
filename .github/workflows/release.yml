@@ -89,11 +89,8 @@ jobs:
         with:
           name: composer-semver.phar
           path: phar/composer-semver
-
+      - run: ls -la && tree .
       - run: spc craft
-        # env:
-        #  GH_TOKEN: ${{ github.token }}
-
       - run: spc micro:combine phar/composer-semver --output out/composer-semver
 
       - run: tar -czvf "composer-semver-$NAME.tar.gz" -C out composer-semver
