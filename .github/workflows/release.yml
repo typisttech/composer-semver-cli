@@ -1,0 +1,97 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '**'
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  GOFLAGS: '-mod=mod'
+
+jobs:
+  phar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: box:4
+
+      - uses: ramsey/composer-install@v3
+        with:
+          composer-options: --no-dev --prefer-dist
+
+      - run: box compile
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: composer-semver.phar
+          path: phar/composer-semver
+          if-no-files-found: error
+
+  spc:
+    needs: phar
+    strategy:
+      matrix:
+        operating-system:
+          - name: "linux-x86_64"
+            os: "ubuntu-latest"
+            spc: "spc-linux-x86_64.tar.gz"
+          - name: "linux-aarch64"
+            os: "ubuntu-latest-arm"
+            spc: "spc-linux-aarch64.tar.gz"
+          - name: "darwin-x86_64"
+            os: "macos-latest-intel"
+            spc: "spc-macos-x86_64.tar.gz"
+          - name: "darwin-aarch64"
+            os: "macos-latest"
+            spc: "spc-macos-aarch64.tar.gz"
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install spc
+        run: |
+          gh release download --repo crazywhalecc/static-php-cli --pattern "$SPC"
+          mkdir -p /tmp/spc
+          tar -xzvf "$SPC" --directory /tmp/spc
+          echo "/tmp/spc" >> "$GITHUB_PATH"
+        env:
+          SPC: ${{ matrix.spc }}
+
+      - run: spc --version
+
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            craft.yml
+          sparse-checkout-cone-mode: false
+
+      - run: spc craft
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver.phar
+          path: phar/composer-semver
+
+      - run: spc micro:combine phar/composer-semver --output out/composer-semver
+
+      - run: tar -czvf "composer-semver-$NAME.tar.gz" -C out composer-semver
+        env:
+          NAME: ${{ matrix.name }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "composer-semver-${{ matrix.name }}.tar.gz"
+          path: "composer-semver-${{ matrix.name }}.tar.gz"
+          if-no-files-found: error
