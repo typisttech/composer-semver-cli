@@ -70,8 +70,6 @@ jobs:
         env:
           WORKSPACE: ${{ github.workspace }}
 
-      - run: exit 1
-
       - name: Download spc
         run: gh release download --repo crazywhalecc/static-php-cli --pattern "spc-$OS-$ARCH.tar.gz" --output spc.tar.gz
         env:
