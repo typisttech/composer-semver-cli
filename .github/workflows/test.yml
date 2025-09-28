@@ -15,8 +15,8 @@ concurrency:
 
 permissions: {}
 
-#env:
-#  GOFLAGS: '-mod=mod'
+env:
+  GOFLAGS: '-mod=mod'
 
 jobs:
   phar:
