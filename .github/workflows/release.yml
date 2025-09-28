@@ -89,9 +89,10 @@ jobs:
         with:
           name: composer-semver.phar
           path: phar/composer-semver
-          
+
+      - run: mkdir -p out
       - run: spc craft
-      - run: spc micro:combine ./phar/composer-semver.phar --output out/composer-semver
+      - run: spc micro:combine ./phar/composer-semver --output out/composer-semver
 
       - run: tar -czvf "composer-semver-$NAME.tar.gz" -C out composer-semver
         env:
