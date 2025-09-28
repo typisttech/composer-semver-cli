@@ -5,8 +5,9 @@ on:
   push:
     branches:
       - main
-    tags:
-      - '**'
+  release:
+    types:
+      - published
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
@@ -137,3 +138,28 @@ jobs:
         run: go test -count=1 -v ./internal
 
       - run: go test -count=1 ./...
+
+  publish:
+    if: github.event_name == 'release'
+    needs: test
+    permissions:
+      id-token: write
+      attestations: write
+#      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: out
+          pattern: composer-semver-*
+          merge-multiple: true
+      # TODO
+      - run: ls -R out
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: out/composer-semver-*
+      - run: gh release upload --repo "$REPO" "$TAG" composer-semver-*
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
