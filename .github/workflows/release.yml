@@ -46,28 +46,31 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "linux-x86_64"
-            os: "ubuntu-latest"
-          - name: "linux-aarch64"
-            os: "ubuntu-latest-arm"
-          - name: "darwin-x86_64"
-            os: "macos-15-intel"
-          - name: "darwin-aarch64"
-            os: "macos-latest"
+          - os: "linux"
+            arch: "x86_64"
+            runs-on: "ubuntu-latest"
+          - os: "linux"
+            arch: "aarch64"
+            runs-on: "ubuntu-latest-arm"
+          - os: "darwin"
+            arch: "x86_64"
+            runs-on: "macos-15-intel"
+          - os: "darwin"
+            arch: "aarch64"
+            runs-on: "macos-latest"
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Set architecture variables
         run: |
-          if [[ "$NAME" == "darwin-x86_64" ]]; then
-            echo "SPC=spc-macos-x86_64.tar.gz" >> $GITHUB_ENV
-          elif [[ "$NAME" == "darwin-aarch64" ]]; then
-            echo "SPC=spc-macos-aarch64.tar.gz" >> $GITHUB_ENV
+          if [[ "$OS" == "darwin" ]]; then
+            echo "SPC=spc-macos-$ARCH.tar.gz" >> $GITHUB_ENV
           else
-            echo "SPC=spc-$NAME.tar.gz" >> $GITHUB_ENV
+            echo "SPC=spc-$OS-$ARCH.tar.gz" >> $GITHUB_ENV
           fi
         env:
-          NAME: ${{ matrix.name }}
+          OS: ${{ matrix.os }}
+          ARCH: ${{ matrix.arch }}
 
       - name: Download spc
         run: gh release download --repo crazywhalecc/static-php-cli --pattern "$SPC"
@@ -90,8 +93,13 @@ jobs:
           name: composer-semver.phar
           path: phar/composer-semver
 
+      - run: ls -R phar
+      - run: ls -R phar/composer-semver
+
       - run: mkdir -p out
       - run: spc craft
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - run: spc micro:combine ./phar/composer-semver --output out/composer-semver
 
       - run: tar -czvf "composer-semver-$NAME.tar.gz" -C out composer-semver
