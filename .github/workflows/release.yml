@@ -72,21 +72,11 @@ jobs:
           ARCH: ${{ matrix.arch }}
           GH_TOKEN: ${{ github.token }}
 
-
       - uses: actions/checkout@v5
         with:
           sparse-checkout: |
             craft.yml
           sparse-checkout-cone-mode: false
-
-      - name: Install upx
-        run: spc install-pkg upx
-        if: matrix.os == 'linux'
-      - name: Enable upx
-        run: |
-          echo "build-options:\n  with-upx-pack: true\n" >> craft.yml
-        if: matrix.os == 'linux'
-
       - run: spc craft
         env:
           GITHUB_TOKEN: ${{ github.token }}
