@@ -34,21 +34,6 @@ jobs:
         with:
           composer-options: --no-dev --prefer-dist
 
-      - run: box compile
-
-#      - run: box verify phar/composer-semver
-#      - run: box info phar/composer-semver
-
-#      - uses: actions/upload-artifact@v4
-#        with:
-#          name: composer-semver.phar
-#          path: phar/composer-semver
-#          if-no-files-found: error
-
-      - run: echo "$WORKSPACE/phar" >> "$GITHUB_PATH"
-        env:
-          WORKSPACE: ${{ github.workspace }}
-
       - uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
