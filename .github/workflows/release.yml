@@ -61,25 +61,21 @@ jobs:
 
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - name: Set architecture variables
-        run: |
-          if [[ "$OS" == "darwin" ]]; then
-            echo "SPC=spc-macos-$ARCH.tar.gz" >> $GITHUB_ENV
-          else
-            echo "SPC=spc-$OS-$ARCH.tar.gz" >> $GITHUB_ENV
-          fi
-        env:
-          OS: ${{ matrix.os }}
-          ARCH: ${{ matrix.arch }}
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver.phar
+          path: phar
 
       - name: Download spc
-        run: gh release download --repo crazywhalecc/static-php-cli --pattern "$SPC"
+        run: gh release download --repo crazywhalecc/static-php-cli --pattern "spc-$OS-$ARCH.tar.gz" --output spc.tar.gz
         env:
+          OS: ${{ matrix.os == 'darwin' && 'macos' || matrix.os }}
+          ARCH: ${{ matrix.arch }}
           GH_TOKEN: ${{ github.token }}
       - name: Install spc
         run: |
           mkdir -p /tmp/spc
-          tar -xzvf "$SPC" --directory /tmp/spc
+          tar -xzvf spc.tar.gz --directory /tmp/spc
           echo "/tmp/spc" >> "$GITHUB_PATH"
 
       - uses: actions/checkout@v5
@@ -87,10 +83,6 @@ jobs:
           sparse-checkout: |
             craft.yml
           sparse-checkout-cone-mode: false
-      - uses: actions/download-artifact@v5
-        with:
-          name: composer-semver.phar
-          path: phar
 
       - run: mkdir -p out
       - run: spc craft
@@ -98,9 +90,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - run: spc micro:combine ./phar/composer-semver --output out/composer-semver
 
-      - run: tar -czvf "composer-semver-$NAME.tar.gz" -C out composer-semver
+      - run: tar -czvf "$NAME" -C out composer-semver
         env:
-          NAME: ${{ matrix.name }}
+          NAME: "composer-semver-${{ matrix.os }}-${{ matrix.arch }}.tar.gz"
       - uses: actions/upload-artifact@v4
         with:
           name: "composer-semver-${{ matrix.os }}-${{ matrix.arch }}.tar.gz"
