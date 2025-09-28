@@ -68,6 +68,7 @@ jobs:
           echo "/tmp/spc" >> "$GITHUB_PATH"
         env:
           SPC: ${{ matrix.spc }}
+          GH_TOKEN: ${{ github.token }}
 
       - run: spc --version
 
