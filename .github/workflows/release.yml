@@ -43,6 +43,7 @@ jobs:
   spc:
     needs: phar
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: "linux-x86_64"
@@ -90,8 +91,8 @@ jobs:
           path: phar/composer-semver
 
       - run: spc craft
-        env:
-          GH_TOKEN: ${{ github.token }}
+        # env:
+        #  GH_TOKEN: ${{ github.token }}
 
       - run: spc micro:combine phar/composer-semver --output out/composer-semver
 
