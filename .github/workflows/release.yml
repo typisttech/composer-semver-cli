@@ -45,31 +45,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: "linux"
-            arch: "x86_64"
-            runs-on: "ubuntu-latest"
-          - os: "linux"
-            arch: "aarch64"
-            runs-on: "ubuntu-24.04-arm"
-          - os: "darwin"
-            arch: "x86_64"
-            runs-on: "macos-15-intel"
-          - os: "darwin"
-            arch: "aarch64"
-            runs-on: "macos-latest"
+        runs-on:
+          - ubuntu-24.04-arm
+          - ubuntu-24.04
+          - macos-15
+          - macos-15-intel
 
     runs-on: ${{ matrix.runs-on }}
     steps:
+      - name: Set environment variables
+        run: |
+          OS=$(uname -s | tr '[:upper:]' '[:lower:]')"
+          ARCH="$(uname -m)"
+          test "$ARCH" = "aarch64" && ARCH="arm64"
+
+          echo "OS=$OS" >> $GITHUB_ENV
+          echo "ARCH=$ARCH" >> $GITHUB_ENV
+
+          test "$OS" = "darwin" && SPC_OS="macos" || SPC_OS="$OS"
+          test "$ARCH" = "arm64" && SPC_ARCH="aarch64" || SPC_ARCH="x86_64"
+
+          echo "SPC_OS=$SPC_OS" >> $GITHUB_ENV
+          echo "SPC_ARCH=$SPC_ARCH" >> $GITHUB_ENV
+
       - name: Download spc
         run: |
-          gh release download --repo crazywhalecc/static-php-cli --pattern "spc-$OS-$ARCH.tar.gz" --output spc.tar.gz && \
+          gh release download --repo crazywhalecc/static-php-cli --pattern "spc-$SPC_OS-$SPC_ARCH.tar.gz" --output spc.tar.gz && \
           mkdir -p /tmp/spc && \
           tar -xzvf spc.tar.gz --directory /tmp/spc && \
           echo "/tmp/spc" >> "$GITHUB_PATH"
         env:
-          OS: ${{ matrix.os == 'darwin' && 'macos' || matrix.os }}
-          ARCH: ${{ matrix.arch }}
           GH_TOKEN: ${{ github.token }}
 
       - uses: actions/checkout@v5
@@ -93,6 +98,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: "composer-semver-${{ matrix.os }}-${{ matrix.arch }}"
+          name: "composer-semver-${{ env.OS }}-${{ env.ARCH }}"
           path: out/composer-semver
           if-no-files-found: error
