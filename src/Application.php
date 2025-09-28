@@ -11,7 +11,7 @@ class Application
 {
     public static function run(): int
     {
-        $name = 'Composer SemVer';
+        $name = 'Composer SemVer CLI';
         $version = '0.1.0-dev';
 
         $app = new SymfonyConsoleApplication($name, $version);
