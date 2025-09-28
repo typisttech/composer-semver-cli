@@ -16,48 +16,27 @@ concurrency:
 permissions: {}
 
 jobs:
-  php-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      highest: ${{ fromJSON(steps.php-matrix.outputs.matrix).highest }}
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          sparse-checkout: |
-            composer.json
-          sparse-checkout-cone-mode: false
-      - uses: typisttech/php-matrix-action@v1
-        id: php-matrix
-        with:
-          mode: full
-
   phpstan:
     runs-on: ubuntu-latest
-    needs: php-matrix
     steps:
       - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ needs.php-matrix.outputs.highest }}
+          php-version: '8.4'
           coverage: none
       - uses: ramsey/composer-install@v3
 
-      - run: phpstan analyse
+      - run: vendor/bin/phpstan analyse
 
   box:
     runs-on: ubuntu-latest
-    needs: php-matrix
     steps:
       - uses: actions/checkout@v5
-        with:
-          sparse-checkout: |
-            box.json
-          sparse-checkout-cone-mode: false
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ needs.php-matrix.outputs.highest }}
+          php-version: '8.4'
           coverage: none
           tools: box:4
 
