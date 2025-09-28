@@ -44,7 +44,7 @@ jobs:
     needs: phar
     strategy:
       matrix:
-        operating-system:
+        include:
           - name: "linux-x86_64"
             os: "ubuntu-latest"
             spc: "spc-linux-x86_64.tar.gz"
