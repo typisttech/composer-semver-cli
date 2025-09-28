@@ -3,8 +3,8 @@ name: Release
 on:
   workflow_dispatch:
   push:
-    tags:
-      - '**'
+#    tags:
+#      - '**'
 
 
 concurrency:
@@ -55,7 +55,7 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          OS=$(uname -s | tr '[:upper:]' '[:lower:]')"
+          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
           ARCH="$(uname -m)"
           test "$ARCH" = "aarch64" && ARCH="arm64"
 
