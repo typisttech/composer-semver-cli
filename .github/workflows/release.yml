@@ -38,7 +38,6 @@ jobs:
         with:
           name: composer-semver.phar
           path: phar/composer-semver
-          compression-level: 9
           if-no-files-found: error
 
   spc:
