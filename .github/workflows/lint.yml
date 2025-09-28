@@ -41,12 +41,7 @@ jobs:
         with:
           php-version: ${{ needs.php-matrix.outputs.highest }}
           coverage: none
-
       - uses: ramsey/composer-install@v3
-        with:
-          composer-options: --no-audit --optimize-autoloader
-        env:
-          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
 
       - run: phpstan analyse
 
