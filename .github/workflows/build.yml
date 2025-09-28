@@ -112,7 +112,7 @@ jobs:
           - ubuntu-24.04-arm
           - ubuntu-24.04
           - macos-15
-          - macos-15-intel
+#          - macos-15-intel
 
     runs-on: ${{ matrix.runs-on }}
     env:
@@ -134,6 +134,8 @@ jobs:
           name: "composer-semver-${{ env.OS }}-${{ env.ARCH }}"
           path: out
 
+      # TODO
+      - run: ls -R out
       - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
         env:
           WORKSPACE: ${{ github.workspace }}
