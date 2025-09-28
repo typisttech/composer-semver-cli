@@ -19,7 +19,7 @@ env:
   GOFLAGS: '-mod=mod'
 
 jobs:
-  phar:
+  php:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -28,7 +28,6 @@ jobs:
         with:
           php-version: '8.4'
           coverage: none
-          tools: box:4
 
       - uses: ramsey/composer-install@v3
         with:
@@ -38,6 +37,9 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
+      - run: echo "$WORKSPACE/bin" >> "$GITHUB_PATH"
+        env:
+          WORKSPACE: ${{ github.workspace }}
       - name: Print composer-semver binary path
         run: go test -count=1 -v ./internal
 
