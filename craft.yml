@@ -4,6 +4,6 @@ extensions:
 sapi:
   - micro
 build-options:
-    with-upx-pack: false
+  with-upx-pack: true
 download-options:
   prefer-pre-built: true

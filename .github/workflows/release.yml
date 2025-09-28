@@ -40,7 +40,7 @@ jobs:
           path: phar/composer-semver
           if-no-files-found: error
 
-  spc:
+  compile:
     needs: phar
     strategy:
       fail-fast: false
