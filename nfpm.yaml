@@ -4,7 +4,6 @@ name: "composer-semver"
 
 arch: ${GOARCH}
 version: ${SEMVER}
-version_metadata: git
 
 maintainer: "Typist Tech Limited <opensource+composer-semver@typist.tech>"
 description: |
@@ -13,5 +12,6 @@ homepage: "https://github.com/typisttech/composer-semver-cli"
 license: "MIT"
 
 contents:
-  - src: ./out/composer-semver-${GOOS}-${GOARCH}
+  - src: ./composer-semver-linux-${GOARCH}/composer-semver
     dst: /usr/bin/composer-semver
+    expand: true

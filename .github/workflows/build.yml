@@ -55,14 +55,13 @@ jobs:
       - name: Set environment variables
         run: |
           OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-          ARCH="$(uname -m)"
-          test "$ARCH" = "aarch64" && ARCH="arm64" || ARCH="amd64"
+          test "$(uname -m)" = "aarch64" && ARCH="arm64" || ARCH="amd64"
 
           echo "OS=$OS" >> $GITHUB_ENV
           echo "ARCH=$ARCH" >> $GITHUB_ENV
 
           test "$OS" = "darwin" && SPC_OS="macos" || SPC_OS="$OS"
-          test "$ARCH" = "arm64" && SPC_ARCH="aarch64" || SPC_ARCH="x86_64"
+          test "$(uname -m)" = "aarch64" && SPC_ARCH="aarch64" || SPC_ARCH="x86_64"
 
           echo "SPC_OS=$SPC_OS" >> $GITHUB_ENV
           echo "SPC_ARCH=$SPC_ARCH" >> $GITHUB_ENV
@@ -119,8 +118,7 @@ jobs:
       - name: Set environment variables
         run: |
           OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-          ARCH="$(uname -m)"
-          test "$ARCH" = "aarch64" && ARCH="arm64" || ARCH="amd64"
+          test "$(uname -m)" = "aarch64" && ARCH="arm64" || ARCH="amd64"
 
           echo "OS=$OS" >> $GITHUB_ENV
           echo "ARCH=$ARCH" >> $GITHUB_ENV
@@ -185,7 +183,22 @@ jobs:
         run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*.deb' --output nfpm.deb
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
       - name: Install nfpm
         run: sudo dpkg -i nfpm.deb
 
+      - run: mkdir -p deb
       - run: nfpm package --packager deb --target deb/
+        env:
+          GOARCH: arm64
+          SEMVER: ${{ github.event.release.tag_name }}
+      - run: nfpm package --packager deb --target deb/
+        env:
+          GOARCH: amd64
+          SEMVER: ${{ github.event.release.tag_name }}
+
+      - name: Install lintian
+        run: sudo apt update && \
+          sudo apt -y install lintian
+
+      - run: lintian deb/*.deb
