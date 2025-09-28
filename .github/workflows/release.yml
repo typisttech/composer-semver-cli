@@ -62,22 +62,30 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Download spc
-        run: gh release download --repo crazywhalecc/static-php-cli --pattern "spc-$OS-$ARCH.tar.gz" --output spc.tar.gz
+        run: |
+          gh release download --repo crazywhalecc/static-php-cli --pattern "spc-$OS-$ARCH.tar.gz" --output spc.tar.gz && \
+          mkdir -p /tmp/spc && \
+          tar -xzvf spc.tar.gz --directory /tmp/spc && \
+          echo "/tmp/spc" >> "$GITHUB_PATH"
         env:
           OS: ${{ matrix.os == 'darwin' && 'macos' || matrix.os }}
           ARCH: ${{ matrix.arch }}
           GH_TOKEN: ${{ github.token }}
-      - name: Install spc
-        run: |
-          mkdir -p /tmp/spc
-          tar -xzvf spc.tar.gz --directory /tmp/spc
-          echo "/tmp/spc" >> "$GITHUB_PATH"
+
 
       - uses: actions/checkout@v5
         with:
           sparse-checkout: |
-            craft.yml
+            craft-${{ matrix.arch }}.yml
           sparse-checkout-cone-mode: false
+
+      - name: Install upx
+        run: spc install-pkg upx
+        if: matrix.os == 'linux'
+      - name: Enable upx
+        run: |
+          echo "build-options:\n  with-upx-pack: false\n" >> craft.yml
+        if: matrix.os == 'linux'
 
       - run: spc craft
         env:

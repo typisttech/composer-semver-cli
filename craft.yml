@@ -3,7 +3,8 @@ extensions:
   - phar
 sapi:
   - micro
-build-options:
-  with-upx-pack: true
 download-options:
   prefer-pre-built: true
+build-options:
+  with-upx-pack: false
+
