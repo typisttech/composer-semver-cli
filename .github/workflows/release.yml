@@ -91,7 +91,7 @@ jobs:
         env:
           WORKSPACE: ${{ github.workspace }}
       - run: mkdir -p out
-      - run: spc micro:combine phar/composer-semver" --output out/composer-semver
+      - run: spc micro:combine phar/composer-semver --output out/composer-semver
 
       - run: tar -czvf "$NAME" -C out composer-semver
         env:
