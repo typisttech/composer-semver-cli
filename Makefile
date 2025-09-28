@@ -2,8 +2,8 @@ export GOFLAGS=-mod=mod
 
 .PHONY: vendor
 vendor:
-	composer install --no-dev --prefer-dist --download-only
-	composer reinstall --prefer-dist --classmap-authoritative '*'
+	composer install --no-dev --prefer-dist
+	composer reinstall --prefer-dist '*'
 
 bin: vendor
 
