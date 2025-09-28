@@ -55,16 +55,16 @@
     "sort-packages": true
   },
   "scripts": {
-    "lint": [
-      "pint --test",
-      "phpstan analyse"
-    ],
     "compile": [
       "@phar",
       "spc craft",
       "mkdir -p out",
       "spc micro:combine phar/composer-semver --output out/composer-semver",
       "out/composer-semver info"
+    ],
+    "lint": [
+      "pint --test",
+      "phpstan analyse"
     ]
   }
 }
