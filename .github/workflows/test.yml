@@ -15,6 +15,9 @@ concurrency:
 
 permissions: {}
 
+#env:
+#  GOFLAGS: '-mod=mod'
+
 jobs:
   phar:
     runs-on: ubuntu-latest
@@ -53,9 +56,4 @@ jobs:
           go-version-file: 'go.mod'
 
       - run: go test -count=1 -v ./internal
-        env:
-          GOFLAGS: -mod=mod
-
       - run: go test -count=1 ./...
-        env:
-          GOFLAGS: -mod=mod
