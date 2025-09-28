@@ -84,7 +84,7 @@ jobs:
         if: matrix.os == 'linux'
       - name: Enable upx
         run: |
-          echo "build-options:\n  with-upx-pack: false\n" >> craft.yml
+          echo "build-options:\n  with-upx-pack: true\n" >> craft.yml
         if: matrix.os == 'linux'
 
       - run: spc craft
