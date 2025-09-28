@@ -74,7 +74,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Install spc
         run: |
-          gh release download --repo crazywhalecc/static-php-cli --pattern "$SPC"
           mkdir -p /tmp/spc
           tar -xzvf "$SPC" --directory /tmp/spc
           echo "/tmp/spc" >> "$GITHUB_PATH"
