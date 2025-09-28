@@ -91,11 +91,8 @@ jobs:
       - run: mkdir -p out
       - run: spc micro:combine phar/composer-semver --output out/composer-semver
 
-      - run: tar -czvf "$NAME" -C out composer-semver
-        env:
-          NAME: "composer-semver-${{ matrix.os }}-${{ matrix.arch }}.tar.gz"
       - uses: actions/upload-artifact@v4
         with:
-          name: "composer-semver-${{ matrix.os }}-${{ matrix.arch }}.tar.gz"
-          path: "composer-semver-${{ matrix.os }}-${{ matrix.arch }}.tar.gz"
+          name: "composer-semver-${{ matrix.os }}-${{ matrix.arch }}"
+          path: out/composer-semver
           if-no-files-found: error
