@@ -2,10 +2,8 @@
 
 # Composer SemVer CLI
 
-[![Packagist Version](https://img.shields.io/packagist/v/typisttech/composer-semver-cli)](https://packagist.org/packages/typisttech/composer-semver-cli)
-[![PHP Version Require](https://img.shields.io/packagist/dependency-v/typisttech/composer-semver-cli/php)](https://github.com/typisttech/composer-semver-cli/blob/main/composer.json)
+[![GitHub Release](https://img.shields.io/github/v/release/typisttech/composer-semver-cli)](https://github.com/typisttech/composer-semver-cli/releases)
 [![Test](https://github.com/typisttech/composer-semver-cli/actions/workflows/test.yml/badge.svg)](https://github.com/typisttech/composer-semver-cli/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/typisttech/composer-semver-cli/graph/badge.svg?token=KM9TUKM530)](https://codecov.io/gh/typisttech/composer-semver-cli)
 [![License](https://img.shields.io/github/license/typisttech/composer-semver-cli.svg)](https://github.com/typisttech/composer-semver-cli/blob/master/LICENSE)
 [![Follow @TangRufus on X](https://img.shields.io/badge/Follow-TangRufus-15202B?logo=x&logoColor=white)](https://x.com/tangrufus)
 [![Follow @TangRufus.com on Bluesky](https://img.shields.io/badge/Bluesky-TangRufus.com-blue?logo=bluesky)](https://bsky.app/profile/tangrufus.com)

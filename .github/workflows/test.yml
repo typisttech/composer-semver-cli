@@ -1,0 +1,57 @@
+name: Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  phar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: box:4
+
+      - uses: ramsey/composer-install@v3
+        with:
+          composer-options: --no-dev --prefer-dist --classmap-authoritative
+
+      - run: box compile
+
+      - run: box verify phar/composer-semver
+      - run: box info phar/composer-semver
+
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: composer-semver.phar
+#          path: phar/composer-semver
+#          if-no-files-found: error
+
+      - run: php phar/composer-semver info
+
+      - run: echo "$WORKSPACE/phar" >> "$GITHUB_PATH"
+        env:
+          WORKSPACE: ${{ github.workspace }}
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+
+      - run: go test -count=1 ./...
+        env:
+          GOFLAGS: -mod=mod
