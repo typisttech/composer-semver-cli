@@ -163,3 +163,29 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+
+  nfpm:
+    if: github.event_name == 'release'
+    needs: publish
+#    permissions:
+#      id-token: write
+#      attestations: write
+#    #      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: out
+          pattern: composer-semver-linux-*
+          merge-multiple: true
+      # TODO
+      - run: ls -R out
+
+      - name: Download nfpm
+        run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*.deb' --output nfpm.deb
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Install nfpm
+        run: sudo dpkg -i nfpm.deb
+
+      - run: nfpm package --packager deb --target deb/

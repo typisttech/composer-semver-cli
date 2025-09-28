@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://nfpm.goreleaser.com/static/schema.json
+
+name: "composer-semver"
+
+arch: ${GOARCH}
+version: ${SEMVER}
+version_metadata: git
+
+maintainer: "Typist Tech Limited <opensource+composer-semver@typist.tech>"
+description: |
+  TODO!
+homepage: "https://github.com/typisttech/composer-semver-cli"
+license: "MIT"
+
+contents:
+  - src: ./out/composer-semver-${GOOS}-${GOARCH}
+    dst: /usr/bin/composer-semver
