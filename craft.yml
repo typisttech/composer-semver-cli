@@ -1,7 +1,7 @@
-php-version: 8.4.12
+php-version: 8.4
 extensions:
   - phar
 sapi:
   - micro
 download-options:
-  prefer-pre-built: true
+  prefer-pre-built: false
