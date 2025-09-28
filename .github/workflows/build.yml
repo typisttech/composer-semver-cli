@@ -55,7 +55,9 @@ jobs:
       - name: Set environment variables
         run: |
           OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-          test "$(uname -m)" = "aarch64" && ARCH="arm64" || ARCH="amd64"
+          ARCH="$(uname -m)"
+          test "$ARCH" = "aarch64" && ARCH="arm64"
+          test "$ARCH" = "x86_64" && ARCH="amd64"
 
           echo "OS=$OS" >> $GITHUB_ENV
           echo "ARCH=$ARCH" >> $GITHUB_ENV
@@ -119,7 +121,9 @@ jobs:
       - name: Set environment variables
         run: |
           OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-          test "$(uname -m)" = "aarch64" && ARCH="arm64" || ARCH="amd64"
+          ARCH="$(uname -m)"
+          test "$ARCH" = "aarch64" && ARCH="arm64"
+          test "$ARCH" = "x86_64" && ARCH="amd64"
 
           echo "OS=$OS" >> $GITHUB_ENV
           echo "ARCH=$ARCH" >> $GITHUB_ENV
