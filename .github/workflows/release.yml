@@ -88,7 +88,9 @@ jobs:
       - run: spc craft
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - run: spc micro:combine ./phar/composer-semver --output out/composer-semver --debug
+      - run: spc micro:combine "$WORKSPACE/phar/composer-semver" --output out/composer-semver --debug
+        env:
+          WORKSPACE: ${{ github.workspace }}
 
       - run: tar -czvf "$NAME" -C out composer-semver
         env:
