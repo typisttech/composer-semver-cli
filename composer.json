@@ -55,20 +55,16 @@
     "sort-packages": true
   },
   "scripts": {
+    "lint": [
+      "pint --test",
+      "phpstan analyse"
+    ],
     "compile": [
       "@phar",
       "spc craft",
       "mkdir -p out",
       "spc micro:combine phar/composer-semver --output out/composer-semver",
       "out/composer-semver info"
-    ],
-    "phar": [
-      "@composer install --no-dev --prefer-dist",
-      "@composer reinstall --prefer-dist '*'",
-      "box compile",
-      "box verify phar/composer-semver",
-      "box info phar/composer-semver",
-      "@php phar/composer-semver info"
     ]
   }
 }
