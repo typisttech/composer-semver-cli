@@ -4,4 +4,4 @@ extensions:
 sapi:
   - micro
 download-options:
-  prefer-pre-built: false
+  prefer-pre-built: true

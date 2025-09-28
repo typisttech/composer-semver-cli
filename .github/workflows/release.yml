@@ -81,7 +81,6 @@ jobs:
           mkdir -p /tmp/spc
           tar -xzvf "$SPC" --directory /tmp/spc
           echo "/tmp/spc" >> "$GITHUB_PATH"
-      - run: spc --version
 
       - uses: actions/checkout@v5
         with:
