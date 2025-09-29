@@ -40,4 +40,4 @@ if (!in_array(PHP_SAPI, ['micro', 'cli', 'phpdbg', 'embed'], true)) {
     throw new RuntimeException('Unable to find the Composer autoloader.');
 })();
 
-Application::run();
+Runner::run();

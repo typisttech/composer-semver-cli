@@ -11,7 +11,7 @@ phar: vendor
 	box compile
 	box verify phar/composer-semver
 	box info phar/composer-semver
-	php phar/composer-semver info
+	php phar/composer-semver --version
 
 test-%: %
 	export PATH="$(shell pwd)/$*:$(shell echo $$PATH)" && \
