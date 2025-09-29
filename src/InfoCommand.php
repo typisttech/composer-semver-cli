@@ -91,30 +91,6 @@ class InfoCommand extends Command
         );
         $io->text($phpVersion);
 
-        $phpBinPath = match (true) {
-            ! empty(PHP_BINARY) => PHP_BINARY,
-            PHP_SAPI === 'micro' => 'N/A',
-            default => 'Unknown',
-        };
-        $phpBin = sprintf(
-            '%-15s %s',
-            'Binary',
-            $phpBinPath,
-        );
-        $io->text($phpBin);
-
-        $io->newLine();
-        $io->writeln('<comment>OS:</>');
-
-        $systemOs = sprintf(
-            '%s %s %s %s',
-            php_uname('s'),
-            php_uname('r'),
-            php_uname('v'),
-            php_uname('m'),
-        );
-        $io->text($systemOs);
-
         // TODO: Add sponsor info.
 
         return Command::SUCCESS;
