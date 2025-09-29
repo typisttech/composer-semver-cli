@@ -99,7 +99,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: "composer-semver-${{ env.OS }}-${{ env.ARCH }}"
+          name: "composer-semver_${{ env.OS }}_${{ env.ARCH }}"
           path: out/composer-semver
           if-no-files-found: error
 
@@ -131,7 +131,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
-          name: "composer-semver-${{ env.OS }}-${{ env.ARCH }}"
+          name: "composer-semver_${{ env.OS }}_${{ env.ARCH }}"
           path: out
 
       # TODO
@@ -161,14 +161,14 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           path: out
-          pattern: composer-semver-*
+          pattern: composer-semver_*
           merge-multiple: true
       # TODO
       - run: ls -R out
       - uses: actions/attest-build-provenance@v3
         with:
-          subject-path: out/composer-semver-*
-      - run: gh release upload --repo "$REPO" "$TAG" composer-semver-*
+          subject-path: out/composer-semver_*
+      - run: gh release upload --repo "$REPO" "$TAG" composer-semver_*
         env:
           TAG: ${{ github.event.release.tag_name }}
           GH_TOKEN: ${{ github.token }}
@@ -185,14 +185,17 @@ jobs:
     steps:
       - uses: actions/download-artifact@v5
         with:
-          path: out
-          pattern: composer-semver-linux-*
-          merge-multiple: true
+          name: composer-semver_linux_arm64
+          path: composer-semver_linux_arm64
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_linux_amd64
+          path: composer-semver_linux_amd64
       # TODO
       - run: ls -R out
 
       - name: Download nfpm
-        run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*.deb' --output nfpm.deb
+        run: gh release download --repo goreleaser/nfpm --pattern ' nfpm_*_arm64.deb ' --output nfpm.deb
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
