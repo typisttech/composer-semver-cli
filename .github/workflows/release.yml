@@ -15,7 +15,7 @@ on:
         type: boolean
 
 concurrency:
-  group: ${{ github.workflow }}-${{ input.version }}
+  group: ${{ github.workflow }}-${{ inputs.version }}
   cancel-in-progress: true
 
 permissions: {}
@@ -58,7 +58,7 @@ jobs:
       - run: ls deb/*.deb | xargs -I {} gh release upload --repo "${REPO}" "${TAG}" {}
         env:
           REPO: ${{ github.repository }}
-          TAG: ${{ input.version }}
+          TAG: ${{ inputs.version }}
           GH_TOKEN: ${{ github.token }}
 
 
@@ -107,6 +107,6 @@ jobs:
       - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
         env:
           REPO: ${{ github.repository }}
-          TAG: ${{ input.version }}
+          TAG: ${{ inputs.version }}
           FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
           GH_TOKEN: ${{ github.token }}
