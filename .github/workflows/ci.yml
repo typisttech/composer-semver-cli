@@ -226,7 +226,7 @@ jobs:
       - run: go test -count=1 ./...
 
   release-tarball:
-#    if: github.event_name == 'release'
+    if: github.event_name == 'release'
     needs:
       - test-darwin
       - test-linux
@@ -241,7 +241,7 @@ jobs:
     permissions:
       id-token: write
       attestations: write
-      contents: write
+#      contents: write
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v5
@@ -263,11 +263,40 @@ jobs:
 
       - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
 
-#      - uses: actions/attest-build-provenance@v3
-#        with:
-#          subject-path: out/composer-semver_*
-#      - run: gh release upload --repo "$REPO" "$TAG" composer-semver_*
-#        env:
-#          TAG: ${{ github.event.release.tag_name }}
-#          GH_TOKEN: ${{ github.token }}
-#          REPO: ${{ github.repository }}
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
+        env:
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.event.release.tag_name }}
+          FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+          GH_TOKEN: ${{ github.token }}
+
+  release-nfpm:
+    if: github.event_name == 'release'
+    needs: test-linux
+    permissions:
+      id-token: write
+      attestations: write
+#        contents: write
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_arm64.deb
+          path: deb
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_amd64.deb
+          path: deb
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: deb/*.deb
+      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
+        env:
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.event.release.tag_name }}
+          FILE: deb/*.deb
+          GH_TOKEN: ${{ github.token }}
