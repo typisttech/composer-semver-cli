@@ -98,7 +98,7 @@ jobs:
           path: out/composer-semver
           if-no-files-found: error
 
-  nfpm:
+  deb:
     needs: build
     runs-on: ubuntu-24.04-arm
     steps:
@@ -113,6 +113,8 @@ jobs:
         with:
           sparse-checkout: |
             nfpm.yaml
+            README.md
+            LICENSE
           sparse-checkout-cone-mode: false
       - uses: actions/download-artifact@v5
         with:
@@ -145,16 +147,9 @@ jobs:
           path: deb/composer-semver_linux_amd64.deb
           if-no-files-found: error
 
-      - run: gh release upload --repo "$REPO" "$TAG" deb/*.deb
-        env:
-          TAG: ${{ github.event.release.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-
   test-linux:
-    needs: nfpm
+    needs: deb
     strategy:
-      fail-fast: false
       matrix:
         runs-on:
           - ubuntu-24.04-arm
@@ -230,22 +225,44 @@ jobs:
 
       - run: go test -count=1 ./...
 
-#  publish:
+  release-binary:
 #    if: github.event_name == 'release'
-#    needs: test
-#    permissions:
-#      id-token: write
-#      attestations: write
-##      contents: write
-#    runs-on: ubuntu-24.04-arm
-#    steps:
-#      - uses: actions/download-artifact@v5
-#        with:
-#          path: out
-#          pattern: composer-semver_*
-#          merge-multiple: true
-#      - run: chmod +x out/composer-semver_*
-#
+    needs:
+      - test-darwin
+      - test-linux
+    strategy:
+      matrix:
+        os:
+          - darwin
+          - linux
+        arch:
+          - arm64
+          - amd64
+    permissions:
+      id-token: write
+      attestations: write
+      contents: write
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            README.md
+            LICENSE
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
+
+      - run: ls -R # TODO!
+      - run: chmod +x composer-semver
+
+      - run: tar -cvf - . | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: tar -cvf - . | gzip -1 - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}-gzip-1.tar.gz
+
+      - run: ls -sh
+
 #      - uses: actions/attest-build-provenance@v3
 #        with:
 #          subject-path: out/composer-semver_*

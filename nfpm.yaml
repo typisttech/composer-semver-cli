@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://nfpm.goreleaser.com/static/schema.json
 
-name: "composer-semver"
+name: composer-semver
 
 arch: ${ARCH}
 version: ${VERSION}
@@ -9,7 +9,8 @@ maintainer: "Typist Tech Limited <opensource+composer-semver@typist.tech>"
 description: |
   TODO!
 homepage: "https://github.com/typisttech/composer-semver-cli"
-license: "MIT"
+license: MIT
+section: utils
 
 contents:
   - src: ${DIST_DIR}/composer-semver
@@ -17,3 +18,11 @@ contents:
     expand: true
     file_info:
       mode: 0755
+  - src: ./LICENSE
+    dst: /usr/share/doc/composer-semver/copyright
+    file_info:
+      mode: 0644
+  - src: ./README.md
+    dst: /usr/share/doc/composer-semver/README.md
+    file_info:
+      mode: 0644
