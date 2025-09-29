@@ -136,9 +136,6 @@ jobs:
           pattern: composer-semver_linux_${{ matrix.arch }}
           path: dist
 
-      - run: ls -R dist # TODO!
-      - run: ls -R . # TODO!
-
       - run: mkdir -p deb
       - run: nfpm package --packager deb --target "${TARGET}"
         env:
