@@ -192,7 +192,7 @@ jobs:
           name: composer-semver_linux_amd64
           path: composer-semver_linux_amd64
       # TODO
-      - run: ls -R out
+      - run: ls -R .
 
       - name: Download nfpm
         run: gh release download --repo goreleaser/nfpm --pattern ' nfpm_*_arm64.deb ' --output nfpm.deb
