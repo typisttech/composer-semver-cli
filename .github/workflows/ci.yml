@@ -39,271 +39,271 @@ jobs:
           path: phar/composer-semver
           if-no-files-found: error
 
-#  build:
-#    needs: phar
-#    strategy:
-#      matrix:
-#        runs-on:
-#          - ubuntu-24.04-arm
-#          - ubuntu-24.04
-#          - macos-15
-#          - macos-15-intel
-#    runs-on: ${{ matrix.runs-on }}
-#    steps:
-#      - name: Set environment variables
-#        run: |
-#          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-#          ARCH="$(uname -m)"
-#          test "${ARCH}" = "aarch64" && ARCH="arm64"
-#          test "${ARCH}" = "x86_64" && ARCH="amd64"
-#
-#          echo "OS=${OS}" >> $GITHUB_ENV
-#          echo "ARCH=${ARCH}" >> $GITHUB_ENV
-#      - name: Set spc environment variables
-#        run: |
-#          test "${OS}" = "darwin" && SPC_OS="macos" || SPC_OS="${OS}"
-#          test "${ARCH}" = "arm64" && SPC_ARCH="aarch64" || SPC_ARCH="x86_64"
-#
-#          echo "SPC_OS=${SPC_OS}" >> $GITHUB_ENV
-#          echo "SPC_ARCH=${SPC_ARCH}" >> $GITHUB_ENV
-#
-#      - name: Download spc
-#        run: |
-#          gh release download --repo crazywhalecc/static-php-cli --pattern "${PATTERN}" --output spc.tar.gz && \
-#          mkdir -p /tmp/spc && \
-#          tar -xzvf spc.tar.gz --directory /tmp/spc && \
-#          echo "/tmp/spc" >> "$GITHUB_PATH"
-#        env:
-#          PATTERN: spc-${{ env.SPC_OS }}-${{ env.SPC_ARCH }}.tar.gz
-#          GH_TOKEN: ${{ github.token }}
-#
-#      - uses: actions/checkout@v5
-#        with:
-#          sparse-checkout: |
-#            craft.yml
-#          sparse-checkout-cone-mode: false
-#      - uses: actions/download-artifact@v5
-#        with:
-#          name: composer-semver.phar
-#          path: phar
-#
-#      - run: spc craft
-#        env:
-#          GITHUB_TOKEN: ${{ github.token }}
-#      - run: mkdir -p out
-#      - run: spc micro:combine phar/composer-semver --output out/composer-semver
-#
-#      - uses: actions/upload-artifact@v4
-#        with:
-#          name: composer-semver_${{ env.OS }}_${{ env.ARCH }}
-#          path: out/composer-semver
-#          if-no-files-found: error
-#
-#  nfpm:
-#    needs: build
-#    runs-on: ubuntu-24.04-arm
-#    steps:
-#      - name: Set environment variables
-#        run: echo "SEMVER=${TAG#v}" >> $GITHUB_ENV
-#        env:
-#          TAG: ${{ github.ref_name }}
-#        if: github.ref_type == 'tag'
-#
-#      - name: Download nfpm
-#        run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*_arm64.deb' --output nfpm.deb
-#        env:
-#          GITHUB_TOKEN: ${{ github.token }}
-#      - name: Install nfpm
-#        run: sudo dpkg -i nfpm.deb
-#
-#      - uses: actions/checkout@v5
-#        with:
-#          sparse-checkout: |
-#            nfpm.yaml
-#            README.md
-#            LICENSE
-#          sparse-checkout-cone-mode: false
-#      - uses: actions/download-artifact@v5
-#        with:
-#          pattern: composer-semver_linux_*
-#          path: dist
-#
-#      - run: mkdir -p deb
-#      - run: nfpm package --packager deb --target "${TARGET}"
-#        env:
-#          ARCH: arm64
-#          DIST_DIR: dist/composer-semver_linux_arm64
-#          VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
-#          TARGET: deb/composer-semver_linux_arm64.deb
-#      - run: nfpm package --packager deb --target "${TARGET}"
-#        env:
-#          ARCH: amd64
-#          DIST_DIR: dist/composer-semver_linux_amd64
-#          VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
-#          TARGET: deb/composer-semver_linux_amd64.deb
-#
-#      - uses: actions/upload-artifact@v4
-#        with:
-#          name: composer-semver_arm64.deb
-#          path: deb/composer-semver_linux_arm64.deb
-#          if-no-files-found: error
-#
-#      - uses: actions/upload-artifact@v4
-#        with:
-#          name: composer-semver_amd64.deb
-#          path: deb/composer-semver_linux_amd64.deb
-#          if-no-files-found: error
-#
-#  test-linux:
-#    needs: nfpm
-#    strategy:
-#      matrix:
-#        runs-on:
-#          - ubuntu-24.04-arm
-#          - ubuntu-24.04
-#    runs-on: ${{ matrix.runs-on }}
-#    env:
-#      GOFLAGS: '-mod=mod'
-#    steps:
-#      - name: Set environment variables
-#        run: |
-#          ARCH="$(uname -m)"
-#          test "${ARCH}" = "aarch64" && ARCH="arm64"
-#          test "${ARCH}" = "x86_64" && ARCH="amd64"
-#
-#          echo "ARCH=${ARCH}" >> $GITHUB_ENV
-#
-#      - uses: actions/download-artifact@v5
-#        with:
-#          name: composer-semver_${{ env.ARCH }}.deb
-#          path: deb
-#      - run: sudo dpkg -i "${DEB}"
-#        env:
-#          DEB: deb/composer-semver_linux_${{ env.ARCH }}.deb
-#
-#      - uses: actions/checkout@v5
-#
-#      - uses: actions/setup-go@v6
-#        with:
-#          go-version-file: 'go.mod'
-#
-#      - name: Print composer-semver binary path
-#        run: go test -count=1 -v ./internal
-#
-#      - run: go test -count=1 ./...
-#
-#  test-darwin:
-#    needs: build
-#    strategy:
-#      matrix:
-#        runs-on:
-#          - macos-15
-#          - macos-15-intel
-#    runs-on: ${{ matrix.runs-on }}
-#    env:
-#      GOFLAGS: '-mod=mod'
-#    steps:
-#      - name: Set environment variables
-#        run: |
-#          ARCH="$(uname -m)"
-#          test "${ARCH}" = "aarch64" && ARCH="arm64"
-#          test "${ARCH}" = "x86_64" && ARCH="amd64"
-#
-#          echo "ARCH=${ARCH}" >> $GITHUB_ENV
-#
-#      - uses: actions/checkout@v5
-#
-#      - uses: actions/download-artifact@v5
-#        with:
-#          name: "composer-semver_darwin_${{ env.ARCH }}"
-#          path: out
-#      - run: |
-#          echo "${WORKSPACE}/out" >> "$GITHUB_PATH" && \
-#          chmod +x out/composer-semver
-#        env:
-#          WORKSPACE: ${{ github.workspace }}
-#
-#      - uses: actions/setup-go@v6
-#        with:
-#          go-version-file: 'go.mod'
-#
-#      - name: Print composer-semver binary path
-#        run: go test -count=1 -v ./internal
-#
-#      - run: go test -count=1 ./...
-#
-#  release-tarball:
-#    if: github.ref_type == 'tag'
-#    needs:
-#      - test-darwin
-#      - test-linux
-#    strategy:
-#      matrix:
-#        os:
-#          - darwin
-#          - linux
-#        arch:
-#          - arm64
-#          - amd64
-#    permissions:
-#      id-token: write
-#      attestations: write
-#      contents: write
-#    runs-on: ubuntu-24.04-arm
-#    steps:
-#      - uses: actions/checkout@v5
-#        with:
-#          sparse-checkout: |
-#            README.md
-#            LICENSE
-#          sparse-checkout-cone-mode: false
-#      - uses: actions/download-artifact@v5
-#        with:
-#          name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
-#      - run: chmod +x composer-semver
-#
-#      - run: |
-#          mkdir -p tarball && \
-#          mv composer-semver tarball/composer-semver && \
-#          mv README.md tarball/README.md && \
-#          mv LICENSE tarball/LICENSE
-#
-#      - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-#
-#      - uses: actions/attest-build-provenance@v3
-#        with:
-#          subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-#      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
-#        env:
-#          REPO: ${{ github.repository }}
-#          TAG: ${{ github.ref_name }}
-#          FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-#          GH_TOKEN: ${{ github.token }}
-#
-#  release-nfpm:
-#    if: github.ref_type == 'tag'
-#    needs: test-linux
-#    permissions:
-#      id-token: write
-#      attestations: write
-#      contents: write
-#    runs-on: ubuntu-24.04-arm
-#    steps:
-#      - uses: actions/download-artifact@v5
-#        with:
-#          name: composer-semver_arm64.deb
-#          path: deb
-#      - uses: actions/download-artifact@v5
-#        with:
-#          name: composer-semver_amd64.deb
-#          path: deb
-#
-#      - uses: actions/attest-build-provenance@v3
-#        with:
-#          subject-path: deb/*.deb
-#      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
-#        env:
-#          REPO: ${{ github.repository }}
-#          TAG: ${{ github.ref_name }}
-#          FILE: deb/*.deb
-#          GH_TOKEN: ${{ github.token }}
+  build:
+    needs: phar
+    strategy:
+      matrix:
+        runs-on:
+          - ubuntu-24.04-arm
+          - ubuntu-24.04
+          - macos-15
+          - macos-15-intel
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - name: Set environment variables
+        run: |
+          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          ARCH="$(uname -m)"
+          test "${ARCH}" = "aarch64" && ARCH="arm64"
+          test "${ARCH}" = "x86_64" && ARCH="amd64"
+
+          echo "OS=${OS}" >> $GITHUB_ENV
+          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+      - name: Set spc environment variables
+        run: |
+          test "${OS}" = "darwin" && SPC_OS="macos" || SPC_OS="${OS}"
+          test "${ARCH}" = "arm64" && SPC_ARCH="aarch64" || SPC_ARCH="x86_64"
+
+          echo "SPC_OS=${SPC_OS}" >> $GITHUB_ENV
+          echo "SPC_ARCH=${SPC_ARCH}" >> $GITHUB_ENV
+
+      - name: Download spc
+        run: |
+          gh release download --repo crazywhalecc/static-php-cli --pattern "${PATTERN}" --output spc.tar.gz && \
+          mkdir -p /tmp/spc && \
+          tar -xzvf spc.tar.gz --directory /tmp/spc && \
+          echo "/tmp/spc" >> "$GITHUB_PATH"
+        env:
+          PATTERN: spc-${{ env.SPC_OS }}-${{ env.SPC_ARCH }}.tar.gz
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            craft.yml
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver.phar
+          path: phar
+
+      - run: spc craft
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - run: mkdir -p out
+      - run: spc micro:combine phar/composer-semver --output out/composer-semver
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: composer-semver_${{ env.OS }}_${{ env.ARCH }}
+          path: out/composer-semver
+          if-no-files-found: error
+
+  nfpm:
+    needs: build
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Set environment variables
+        run: echo "SEMVER=${TAG#v}" >> $GITHUB_ENV
+        env:
+          TAG: ${{ github.ref_name }}
+        if: github.ref_type == 'tag'
+
+      - name: Download nfpm
+        run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*_arm64.deb' --output nfpm.deb
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Install nfpm
+        run: sudo dpkg -i nfpm.deb
+
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            nfpm.yaml
+            README.md
+            LICENSE
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: composer-semver_linux_*
+          path: dist
+
+      - run: mkdir -p deb
+      - run: nfpm package --packager deb --target "${TARGET}"
+        env:
+          ARCH: arm64
+          DIST_DIR: dist/composer-semver_linux_arm64
+          VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
+          TARGET: deb/composer-semver_linux_arm64.deb
+      - run: nfpm package --packager deb --target "${TARGET}"
+        env:
+          ARCH: amd64
+          DIST_DIR: dist/composer-semver_linux_amd64
+          VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
+          TARGET: deb/composer-semver_linux_amd64.deb
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: composer-semver_arm64.deb
+          path: deb/composer-semver_linux_arm64.deb
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: composer-semver_amd64.deb
+          path: deb/composer-semver_linux_amd64.deb
+          if-no-files-found: error
+
+  test-linux:
+    needs: nfpm
+    strategy:
+      matrix:
+        runs-on:
+          - ubuntu-24.04-arm
+          - ubuntu-24.04
+    runs-on: ${{ matrix.runs-on }}
+    env:
+      GOFLAGS: '-mod=mod'
+    steps:
+      - name: Set environment variables
+        run: |
+          ARCH="$(uname -m)"
+          test "${ARCH}" = "aarch64" && ARCH="arm64"
+          test "${ARCH}" = "x86_64" && ARCH="amd64"
+
+          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_${{ env.ARCH }}.deb
+          path: deb
+      - run: sudo dpkg -i "${DEB}"
+        env:
+          DEB: deb/composer-semver_linux_${{ env.ARCH }}.deb
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Print composer-semver binary path
+        run: go test -count=1 -v ./internal
+
+      - run: go test -count=1 ./...
+
+  test-darwin:
+    needs: build
+    strategy:
+      matrix:
+        runs-on:
+          - macos-15
+          - macos-15-intel
+    runs-on: ${{ matrix.runs-on }}
+    env:
+      GOFLAGS: '-mod=mod'
+    steps:
+      - name: Set environment variables
+        run: |
+          ARCH="$(uname -m)"
+          test "${ARCH}" = "aarch64" && ARCH="arm64"
+          test "${ARCH}" = "x86_64" && ARCH="amd64"
+
+          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: "composer-semver_darwin_${{ env.ARCH }}"
+          path: out
+      - run: |
+          echo "${WORKSPACE}/out" >> "$GITHUB_PATH" && \
+          chmod +x out/composer-semver
+        env:
+          WORKSPACE: ${{ github.workspace }}
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Print composer-semver binary path
+        run: go test -count=1 -v ./internal
+
+      - run: go test -count=1 ./...
+
+  release-tarball:
+    if: github.ref_type == 'tag'
+    needs:
+      - test-darwin
+      - test-linux
+    strategy:
+      matrix:
+        os:
+          - darwin
+          - linux
+        arch:
+          - arm64
+          - amd64
+    permissions:
+      id-token: write
+      attestations: write
+      contents: write
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            README.md
+            LICENSE
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
+      - run: chmod +x composer-semver
+
+      - run: |
+          mkdir -p tarball && \
+          mv composer-semver tarball/composer-semver && \
+          mv README.md tarball/README.md && \
+          mv LICENSE tarball/LICENSE
+
+      - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
+        env:
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+          GH_TOKEN: ${{ github.token }}
+
+  release-nfpm:
+    if: github.ref_type == 'tag'
+    needs: test-linux
+    permissions:
+      id-token: write
+      attestations: write
+      contents: write
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_arm64.deb
+          path: deb
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_amd64.deb
+          path: deb
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: deb/*.deb
+      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
+        env:
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          FILE: deb/*.deb
+          GH_TOKEN: ${{ github.token }}
