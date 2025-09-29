@@ -3,7 +3,7 @@ package main_test
 import (
 	"testing"
 
-	"github.com/typisttech/composer-semver-cli/internal"
+	"github.com/typisttech/composer-semver/internal"
 )
 
 //go:generate go run ./main.go

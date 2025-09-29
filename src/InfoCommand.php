@@ -15,6 +15,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class InfoCommand extends Command
 {
+    private const string GIT_VERSION = '@git-version@';
+    private const string GIT_COMMIT = '@git-commit@';
+
     private const BANNER = <<<BANNER
                         ____
                        / ___|___  _ __ ___  _ __   ___  ___  ___ _ __
@@ -47,6 +50,18 @@ class InfoCommand extends Command
             $this->version,
         );
         $io->text($app);
+
+        $release = sprintf(
+            '<href=https://github.com/typisttech/composer-semver/releases/tag/%1$s>https://github.com/typisttech/composer-semver/releases/tag/%1$s</>',
+            $this->version,
+        );
+        if ($this->version != self::GIT_VERSION ) {
+            $release = sprintf(
+                '<href=https://github.com/typisttech/composer-semver/commit/%1$s>https://github.com/typisttech/composer-semver/commit/%1$s</>',
+                self::GIT_COMMIT,
+            );
+        }
+        $io->text($release);
 
         $io->newLine(2);
         $io->writeln('<comment>Built with:</>');

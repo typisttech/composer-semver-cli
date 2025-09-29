@@ -1,5 +1,5 @@
 {
-  "name": "typisttech/composer-semver-cli",
+  "name": "typisttech/composer-semver",
   "description": "TODO!",
   "license": "MIT",
   "type": "project",
@@ -22,10 +22,10 @@
       "role": "Developer"
     }
   ],
-  "homepage": "https://github.com/typisttech/composer-semver-cli",
+  "homepage": "https://github.com/typisttech/composer-semver",
   "support": {
-    "issues": "https://github.com/typisttech/composer-semver-cli/issues",
-    "source": "https://github.com/typisttech/composer-semver-cli"
+    "issues": "https://github.com/typisttech/composer-semver/issues",
+    "source": "https://github.com/typisttech/composer-semver"
   },
   "require": {
     "php": "~8.4.12",

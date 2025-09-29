@@ -1,4 +1,7 @@
 {
   "output": "phar/composer-semver",
-  "check-requirements": false
+  "check-requirements": false,
+  "git-tag": "git-tag",
+  "git-version": "git-version",
+  "git-commit": "git-commit"
 }

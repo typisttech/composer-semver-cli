@@ -1,10 +1,10 @@
 <div align="center">
 
-# Composer SemVer CLI
+# Composer SemVer
 
-[![GitHub Release](https://img.shields.io/github/v/release/typisttech/composer-semver-cli)](https://github.com/typisttech/composer-semver-cli/releases)
-[![CI](https://github.com/typisttech/composer-semver-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/typisttech/composer-semver-cli/actions/workflows/test.yml)
-[![License](https://img.shields.io/github/license/typisttech/composer-semver-cli.svg)](https://github.com/typisttech/composer-semver-cli/blob/master/LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/typisttech/composer-semver)](https://github.com/typisttech/composer-semver/releases)
+[![CI](https://github.com/typisttech/composer-semver/actions/workflows/ci.yml/badge.svg)](https://github.com/typisttech/composer-semver/actions/workflows/test.yml)
+[![License](https://img.shields.io/github/license/typisttech/composer-semver.svg)](https://github.com/typisttech/composer-semver/blob/master/LICENSE)
 [![Follow @TangRufus on X](https://img.shields.io/badge/Follow-TangRufus-15202B?logo=x&logoColor=white)](https://x.com/tangrufus)
 [![Follow @TangRufus.com on Bluesky](https://img.shields.io/badge/Bluesky-TangRufus.com-blue?logo=bluesky)](https://bsky.app/profile/tangrufus.com)
 [![Sponsor @TangRufus via GitHub](https://img.shields.io/badge/Sponsor-TangRufus-EA4AAA?logo=githubsponsors)](https://github.com/sponsors/tangrufus)
@@ -35,12 +35,12 @@ TODO!
 
 ## Credits
 
-[`Composer SemVer CLI`](https://github.com/typisttech/composer-semver-cli) is a [Typist Tech](https://typist.tech)
+[`Composer SemVer`](https://github.com/typisttech/composer-semver) is a [Typist Tech](https://typist.tech)
 project and maintained by [Tang Rufus](https://x.com/TangRufus), freelance
 developer [for hire](https://typist.tech/contact/).
 
 Full list of contributors can be
-found [on GitHub](https://github.com/typisttech/composer-semver-cli/graphs/contributors).
+found [on GitHub](https://github.com/typisttech/composer-semver/graphs/contributors).
 
 ## Copyright and License
 

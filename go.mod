@@ -1,4 +1,4 @@
-module github.com/typisttech/composer-semver-cli
+module github.com/typisttech/composer-semver
 
 go 1.25.1
 

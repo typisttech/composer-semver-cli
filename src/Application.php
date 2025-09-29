@@ -9,19 +9,19 @@ use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 
 class Application
 {
+    private const string NAME = 'Composer SemVer';
+    private const string GIT_TAG = '@git-tag@';
+
     public static function run(): int
     {
-        $name = 'Composer SemVer CLI';
-        $version = '0.1.0-dev';
-
-        $app = new SymfonyConsoleApplication($name, $version);
+        $app = new SymfonyConsoleApplication(self::NAME, self::GIT_TAG);
 
         $parser = new VersionParser();
 
         $app->addCommands([
             new NormalizeCommand($parser),
             new ParseCommand($parser),
-            new InfoCommand($name, $version),
+            new InfoCommand(self::NAME, self::GIT_TAG),
         ]);
 
         return $app->run();
