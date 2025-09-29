@@ -15,8 +15,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class InfoCommand extends Command
 {
-    private const string GIT_COMMIT = '@git-commit@';
-
     private const BANNER = <<<BANNER
                         ____
                        / ___|___  _ __ ___  _ __   ___  ___  ___ _ __
