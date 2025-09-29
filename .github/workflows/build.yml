@@ -45,8 +45,8 @@ jobs:
         runs-on:
           - ubuntu-24.04-arm
           - ubuntu-24.04
-#          - macos-15
-#          - macos-15-intel
+          - macos-15
+          - macos-15-intel
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Set environment variables
@@ -176,10 +176,9 @@ jobs:
         with:
           name: composer-semver_${{ env.ARCH }}.deb
           path: deb
-      - run: ls -R deb # TODO!
       - run: sudo dpkg -i "${DEB}"
         env:
-          DEB: deb/composer-semver_${{ env.ARCH }}.deb
+          DEB: deb/composer-semver_linux_${{ env.ARCH }}.deb
 
       - uses: actions/checkout@v5
 
@@ -192,45 +191,45 @@ jobs:
 
       - run: go test -count=1 ./...
 
-#  test-darwin:
-#    needs: build
-#    strategy:
-#      matrix:
-#        runs-on:
-#          - macos-15
-#          - macos-15-intel
-#    runs-on: ${{ matrix.runs-on }}
-#    env:
-#      GOFLAGS: '-mod=mod'
-#    steps:
-#      - name: Set environment variables
-#        run: |
-#          ARCH="$(uname -m)"
-#          test "${ARCH}" = "aarch64" && ARCH="arm64"
-#          test "${ARCH}" = "x86_64" && ARCH="amd64"
-#
-#          echo "ARCH=${ARCH}" >> $GITHUB_ENV
-#
-#      - uses: actions/checkout@v5
-#
-#      - uses: actions/download-artifact@v5
-#        with:
-#          name: "composer-semver_darwin_${{ env.ARCH }}"
-#          path: out
-#      - run: |
-#          echo "${WORKSPACE}/out" >> "$GITHUB_PATH"
-#          chmod +x out/composer-semver
-#        env:
-#          WORKSPACE: ${{ github.workspace }}
-#
-#      - uses: actions/setup-go@v6
-#        with:
-#          go-version-file: 'go.mod'
-#
-#      - name: Print composer-semver binary path
-#        run: go test -count=1 -v ./internal
-#
-#      - run: go test -count=1 ./...
+  test-darwin:
+    needs: build
+    strategy:
+      matrix:
+        runs-on:
+          - macos-15
+          - macos-15-intel
+    runs-on: ${{ matrix.runs-on }}
+    env:
+      GOFLAGS: '-mod=mod'
+    steps:
+      - name: Set environment variables
+        run: |
+          ARCH="$(uname -m)"
+          test "${ARCH}" = "aarch64" && ARCH="arm64"
+          test "${ARCH}" = "x86_64" && ARCH="amd64"
+
+          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: "composer-semver_darwin_${{ env.ARCH }}"
+          path: out
+      - run: |
+          echo "${WORKSPACE}/out" >> "$GITHUB_PATH"
+          chmod +x out/composer-semver
+        env:
+          WORKSPACE: ${{ github.workspace }}
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Print composer-semver binary path
+        run: go test -count=1 -v ./internal
+
+      - run: go test -count=1 ./...
 
 #  publish:
 #    if: github.event_name == 'release'
