@@ -55,10 +55,13 @@ jobs:
         with:
           subject-path: deb/*.deb
 
-      - run: |
+      - name: Upload debs
+        run: |
           DEBS=$(find deb -type f -name '*.deb')
           for DEB in ${DEBS}; do
+            echo "::group::==> ${DEB}"
             gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${DEB}"
+            echo "::endgroup::"
           done
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
@@ -74,14 +77,6 @@ jobs:
       attestations: write
       contents: write
       actions: read
-    strategy:
-      matrix:
-        os:
-          - darwin
-          - linux
-        arch:
-          - arm64
-          - amd64
     steps:
       - uses: actions/checkout@v5
         with:
@@ -100,7 +95,8 @@ jobs:
 
       - run: ls -R bin # TODO!
 
-      - run: |
+      - name: Find binaries
+        run: |
           DIRS=$(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0 | \
           xargs -0P 0 -n1 -- dirname | \
           xargs -n1 -- basename)
@@ -111,31 +107,39 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
-      - run: |
+      - name: Create tarballs
+        run: |
           mkdir -p tarball
           
           for DIR in ${DIRS}; do
+            echo "::group::==> ${DIR}"
             chmod +x "bin/${DIR}/composer-semver" && \
             tar -cvf - "bin/${DIR}/composer-semver" README.md LICENSE | \
             gzip --best - > "tarball/${DIR}.tar.gz"
+            echo "::endgroup::"
           done
-
-      - run: ls -R tarball # TODO!
 
         # TODO:
       - run: echo 'aaaa' >> tarball/composer-semver_linux_arm64.tar.gz
 
-      - run: |
+      - name: Validate tarballs
+        run: |
           for DIR in ${DIRS}; do
+            echo "::group::==> ${DIR}"
             tar -ztf "tarball/${DIR}.tar.gz"
+            echo "::endgroup::"
           done
 
       - uses: actions/attest-build-provenance@v3
         with:
           subject-path: tarball/*.tar.gz
-      - run: |
+
+      - name: Upload tarballs
+        run: |
           for DIR in ${DIRS}; do
+            echo "::group::==> ${DIR}"
             gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${DIR}.tar.gz"
+            echo "::endgroup::"
           done
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
