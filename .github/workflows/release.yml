@@ -49,8 +49,7 @@ jobs:
           pattern: '*.deb'
           path: deb
           run-id: ${{ inputs.run_id }}
-
-      - run: ls -R deb # TODO!
+          github-token: ${{ github.token }}
 
       - uses: actions/attest-build-provenance@v3
         with:
@@ -91,6 +90,8 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
       - run: chmod +x composer-semver
 
       - run: |
@@ -98,8 +99,6 @@ jobs:
           mv composer-semver tarball/composer-semver && \
           mv README.md tarball/README.md && \
           mv LICENSE tarball/LICENSE
-
-      - run: ls -R tarball # TODO!
 
       - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
 
