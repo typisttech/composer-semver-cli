@@ -102,6 +102,12 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04-arm
     steps:
+      - name: Set environment variables
+        run: echo "SEMVER=${TAG#v}" >> $GITHUB_ENV
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        if: github.event_name == 'release'
+
       - name: Download nfpm
         run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*_arm64.deb' --output nfpm.deb
         env:
@@ -126,13 +132,13 @@ jobs:
         env:
           ARCH: arm64
           DIST_DIR: dist/composer-semver_linux_arm64
-          VERSION: ${{ github.event.release.tag_name || format('0.0.0-{0}', github.sha) }}
+          VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
           TARGET: deb/composer-semver_linux_arm64.deb
       - run: nfpm package --packager deb --target "${TARGET}"
         env:
           ARCH: amd64
           DIST_DIR: dist/composer-semver_linux_amd64
-          VERSION: ${{ github.event.release.tag_name || format('0.0.0-{0}', github.sha) }}
+          VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
           TARGET: deb/composer-semver_linux_amd64.deb
 
       - uses: actions/upload-artifact@v4
