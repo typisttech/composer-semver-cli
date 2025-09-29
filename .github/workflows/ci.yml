@@ -245,4 +245,4 @@ jobs:
           REF: ${{ github.ref }}
           VERSION: ${{ github.ref_name }}
           RUN_ID: ${{ github.run_id }}
-          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
