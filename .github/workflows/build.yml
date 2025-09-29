@@ -133,12 +133,14 @@ jobs:
         with:
           name: "composer-semver-${{ env.OS }}-${{ env.ARCH }}"
           path: out
-
-      # TODO
-      - run: ls -R out
       - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
         env:
           WORKSPACE: ${{ github.workspace }}
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+
       - name: Print composer-semver binary path
         run: go test -count=1 -v ./internal
 
