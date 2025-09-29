@@ -15,3 +15,5 @@ contents:
   - src: ${DIST_DIR}/composer-semver
     dst: /usr/bin/composer-semver
     expand: true
+    file_info:
+      mode: 0755
