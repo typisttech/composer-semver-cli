@@ -239,11 +239,10 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
       - run: |
-          gh workflow run publish.yml \
+          gh workflow run release.yml \
             --ref "${REF}" \
             -f version="${VERSION}" \
             -f run_id="${RUN_ID}"
-
         env:
           REF: ${{ github.ref }}
           VERSION: ${{ github.ref_name }}
