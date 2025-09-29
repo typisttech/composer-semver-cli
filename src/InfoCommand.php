@@ -55,11 +55,12 @@ class InfoCommand extends Command
             $this->version,
         );
         // https://github.com/box-project/box/blob/b0123f358f2a32488c92e09bf56f16d185e4e3cb/src/Configuration/Configuration.php#L2116
-        if (preg_match('/^.+-\d+-g[a-f0-9]{7,}$/', $this->version)) {
+        if (preg_match('/^(?<tag>.+)-\d+-g(?<hash>[a-f0-9]{7})$/', $this->version, $matches)) {
             // Not on a tag.
             $release = sprintf(
-                '<href=https://github.com/typisttech/composer-semver/commit/%1$s>https://github.com/typisttech/composer-semver/commit/%1$s</>',
-                self::GIT_COMMIT,
+                '<href=https://github.com/typisttech/composer-semver/compare/%1$s...%2$s>https://github.com/typisttech/composer-semver/compare/%1$s...%2$s</>',
+                $matches['tag'],
+                $matches['hash'],
             );
         }
         $io->text($release);
