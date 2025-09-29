@@ -118,10 +118,7 @@ jobs:
         with:
           pattern: composer-semver_linux_*
           path: dist
-      - uses: actions/download-artifact@v5
-        with:
-          name: composer-semver_linux_amd64
-          path: composer-semver_linux_amd64
+      - run: ls -R dist
 
       - run: mkdir -p deb
       - run: nfpm package --packager deb --target "${TARGET}"
@@ -181,9 +178,6 @@ jobs:
           path: deb/composer-semver.deb
       - run: sudo dpkg -i deb/composer-semver.deb
 
-      - run: which composer-semver
-      - run: composer-semver info
-
       - uses: actions/checkout@v5
 
       - uses: actions/setup-go@v6
@@ -220,8 +214,9 @@ jobs:
         with:
           name: "composer-semver_darwin_${{ env.ARCH }}"
           path: out
-# TODO!     - run: chmod +x out/composer-semver
-      - run: echo "${WORKSPACE}/out" >> "$GITHUB_PATH"
+      - run: |
+          echo "${WORKSPACE}/out" >> "$GITHUB_PATH"
+          chmod +x out/composer-semver
         env:
           WORKSPACE: ${{ github.workspace }}
 
