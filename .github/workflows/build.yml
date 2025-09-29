@@ -134,17 +134,6 @@ jobs:
           name: "composer-semver_${{ env.OS }}_${{ env.ARCH }}"
           path: out
 
-      # TODO
-      - run: ls -R out
-      - run: file "out/composer-semver"
-
-        env:
-          OS: ${{ env.OS }}
-          ARCH: ${{ env.ARCH }}
-      - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
-        env:
-          WORKSPACE: ${{ github.workspace }}
-
       - uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
@@ -152,6 +141,12 @@ jobs:
       # TODO
       - run: ls -R out
       - run: file "out/composer-semver"
+        env:
+          OS: ${{ env.OS }}
+          ARCH: ${{ env.ARCH }}
+      - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
+        env:
+          WORKSPACE: ${{ github.workspace }}
 
       - name: Print composer-semver binary path
         run: go test -count=1 -v ./internal
@@ -226,7 +221,8 @@ jobs:
           VERSION: ${{ github.event.release.tag_name }}
 
       - name: Install lintian
-        run: sudo apt update && \
-          sudo apt -y install lintian
+        run: |
+          sudo apt-get update
+          sudo apt-get install lintian
 
       - run: lintian deb/*.deb
