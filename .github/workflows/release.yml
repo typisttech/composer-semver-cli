@@ -55,7 +55,11 @@ jobs:
         with:
           subject-path: deb/*.deb
 
-      - run: find deb -type f -name '*.deb' -exec  gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {} \;
+      - run: |
+          DEBS=$(find deb -type f -name '*.deb')
+          for DEB in ${DEBS}; do
+            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${DEB}"
+          done
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
@@ -106,18 +110,25 @@ jobs:
             echo "${DIRS}"
             echo EOF
           } >> "$GITHUB_ENV"
-      - run: echo "${DIRS}" # TODO!
 
       - run: |
+          mkdir -p tarball
+          
           for DIR in ${DIRS}; do
             chmod +x "bin/${DIR}/composer-semver" && \
             tar -cvf - "bin/${DIR}/composer-semver" README.md LICENSE | \
-            gzip --best - > "tarball/${DIR}.tar.gz" && \
-
-            tar -ztf "tarball/${DIR}.tar.gz"
+            gzip --best - > "tarball/${DIR}.tar.gz"
           done
 
       - run: ls -R tarball # TODO!
+
+        # TODO:
+      - run: echo 'aaaa' >> tarball/composer-semver_linux_arm64.tar.gz
+
+      - run: |
+          for DIR in ${DIRS}; do
+            tar -ztf "tarball/${DIR}.tar.gz"
+          done
 
       - uses: actions/attest-build-provenance@v3
         with:
