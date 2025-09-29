@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Git tag for the release. For example, v1.2.3'
+        required: true
+      run_id:
+        description: 'ID of the CI workflow run that created the release assets'
+        type: number
+        required: true
+      clobber:
+        description: 'Overwrite existing assets of the same name'
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ input.version }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  drafter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: release-drafter/release-drafter@v6
+        with:
+          version: ${{ inputs.version }}
+          tag: ${{ inputs.version }}
+          publish: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deb:
+    needs: drafter
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      id-token: write
+      attestations: write
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: '*.deb'
+          path: deb
+          run-id: ${{ inputs.run_id }}
+
+      - run: ls -R deb # TODO!
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: deb/*.deb
+
+      - run: ls deb/*.deb | xargs -I {} gh release upload --repo "${REPO}" "${TAG}" {}
+        env:
+          REPO: ${{ github.repository }}
+          TAG: ${{ input.version }}
+          GH_TOKEN: ${{ github.token }}
+
+
+  tarball:
+    needs: drafter
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      id-token: write
+      attestations: write
+      contents: write
+    strategy:
+      matrix:
+        os:
+          - darwin
+          - linux
+        arch:
+          - arm64
+          - amd64
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            README.md
+            LICENSE
+          sparse-checkout-cone-mode: false
+          ref: ${{ inputs.version }}
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
+      - run: chmod +x composer-semver
+
+      - run: |
+          mkdir -p tarball && \
+          mv composer-semver tarball/composer-semver && \
+          mv README.md tarball/README.md && \
+          mv LICENSE tarball/LICENSE
+
+      - run: ls -R tarball # TODO!
+
+      - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
+        env:
+          REPO: ${{ github.repository }}
+          TAG: ${{ input.version }}
+          FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+          GH_TOKEN: ${{ github.token }}
