@@ -225,7 +225,7 @@ jobs:
 
       - run: go test -count=1 ./...
 
-  release-binary:
+  release-tar:
 #    if: github.event_name == 'release'
     needs:
       - test-darwin
@@ -255,7 +255,15 @@ jobs:
           name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
       - run: chmod +x composer-semver
 
-      - run: tar -cvf - . | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: |
+          mkdir -p tar && \
+          mv composer-semver tar/composer-semver && \
+          mv README.md tar/README.md && \
+          mv LICENSE tar/LICENSE
+
+      - run: ls -R tar
+
+      - run: tar -cvf - tar | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
 
 #      - uses: actions/attest-build-provenance@v3
 #        with:
