@@ -12,6 +12,6 @@ homepage: "https://github.com/typisttech/composer-semver-cli"
 license: "MIT"
 
 contents:
-  - src: ./composer-semver_linux_${ARCH}/composer-semver
+  - src: ${DIST_DIR}/composer-semver
     dst: /usr/bin/composer-semver
     expand: true
