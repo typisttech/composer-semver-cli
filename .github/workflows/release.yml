@@ -55,7 +55,7 @@ jobs:
         with:
           subject-path: deb/*.deb
 
-      - run: find deb -type f -name '*.deb' | xargs -I {} gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {}
+      - run: find deb -type f -name '*.deb' -exec  gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {} \;
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
@@ -89,26 +89,35 @@ jobs:
 
       - uses: actions/download-artifact@v5
         with:
-          name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
+          pattern: composer-semver_*_*
+          path: bin
           run-id: ${{ inputs.run_id }}
           github-token: ${{ github.token }}
-      - run: chmod +x composer-semver
+
+      - run: ls -R bin # TODO!
+
+      - run: echo "BASENAMES=$(find bin -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)" >> $GITHUB_ENV
+
+      - run: echo "${BASENAMES}" # TODO!
 
       - run: |
-          mkdir -p tarball && \
-          mv composer-semver tarball/composer-semver && \
-          mv README.md tarball/README.md && \
-          mv LICENSE tarball/LICENSE
+          for NAME in ${BASENAMES}; do
+            chmod +x "bin/${NAME}/composer-semver"
+            tar -cvf - tarball "bin/${NAME}/composer-semver" README.md LICENSE | \
+            gzip --best - > "tarball/${NAME}.tar.gz"
+          done
 
-      - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: ls -R tarball # TODO!
 
       - uses: actions/attest-build-provenance@v3
         with:
-          subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-      - run: gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${FILE}"
+          subject-path: tarball/*.tar.gz
+      - run: |
+          for NAME in ${BASENAMES}; do
+            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${NAME}.tar.gz"
+          done
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
           TAG: ${{ inputs.version }}
-          FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
           GH_TOKEN: ${{ github.token }}
