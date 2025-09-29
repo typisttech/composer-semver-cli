@@ -161,7 +161,7 @@ jobs:
       id-token: write
       attestations: write
 #      contents: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/download-artifact@v5
         with:
