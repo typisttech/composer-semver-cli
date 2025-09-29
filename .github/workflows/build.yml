@@ -137,7 +137,7 @@ jobs:
       # TODO
       - run: ls -R out
       - run: file "out/composer-semver"
-      - run: file "out/composer-semver_$OS_$ARCH"
+
         env:
           OS: ${{ env.OS }}
           ARCH: ${{ env.ARCH }}
@@ -148,6 +148,10 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
+
+      # TODO
+      - run: ls -R out
+      - run: file "out/composer-semver"
 
       - name: Print composer-semver binary path
         run: go test -count=1 -v ./internal
