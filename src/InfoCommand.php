@@ -15,9 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class InfoCommand extends Command
 {
-    private const string GIT_VERSION = '@git-version@';
     private const string GIT_COMMIT = '@git-commit@';
-    private const string GIT = '@git@';
 
     private const BANNER = <<<BANNER
                         ____
@@ -45,13 +43,6 @@ class InfoCommand extends Command
         $io->text($bannerRows);
         $io->newLine(2);
 
-        $io->newLine(2);
-        $io->writeln('GIT_TAG: '. $this->version);
-        $io->writeln('GIT_VERSION: '. self::GIT_VERSION);
-        $io->writeln('GIT_COMMIT:  '. self::GIT_COMMIT);
-        $io->writeln('GIT: '. self::GIT);
-        $io->newLine(2);
-
         $app = sprintf(
             '%-15s <info>%s</info>',
             $this->name,
@@ -63,7 +54,9 @@ class InfoCommand extends Command
             '<href=https://github.com/typisttech/composer-semver/releases/tag/%1$s>https://github.com/typisttech/composer-semver/releases/tag/%1$s</>',
             $this->version,
         );
-        if ($this->version != self::GIT_VERSION ) {
+        // https://github.com/box-project/box/blob/b0123f358f2a32488c92e09bf56f16d185e4e3cb/src/Configuration/Configuration.php#L2116
+        if (preg_match('/^.+-\d+-g[a-f0-9]{7,}$/', $this->version)) {
+            // Not on a tag.
             $release = sprintf(
                 '<href=https://github.com/typisttech/composer-semver/commit/%1$s>https://github.com/typisttech/composer-semver/commit/%1$s</>',
                 self::GIT_COMMIT,
