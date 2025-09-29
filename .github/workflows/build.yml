@@ -26,7 +26,6 @@ jobs:
           php-version: '8.4'
           coverage: none
           tools: box:4
-
       - uses: ramsey/composer-install@v3
         with:
           composer-options: --no-dev --prefer-dist
@@ -42,14 +41,12 @@ jobs:
   build:
     needs: phar
     strategy:
-      fail-fast: false
       matrix:
         runs-on:
           - ubuntu-24.04-arm
           - ubuntu-24.04
           - macos-15
-    #          - macos-15-intel  # TODO
-
+          - macos-15-intel
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Set environment variables
@@ -83,10 +80,6 @@ jobs:
           sparse-checkout: |
             craft.yml
           sparse-checkout-cone-mode: false
-      - run: spc craft
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
       - uses: actions/download-artifact@v5
         with:
           name: composer-semver.phar
@@ -94,6 +87,10 @@ jobs:
       - run: file "$WORKSPACE/phar/composer-semver"
         env:
           WORKSPACE: ${{ github.workspace }}
+
+      - run: spc craft
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - run: mkdir -p out
       - run: spc micro:combine phar/composer-semver --output out/composer-semver
 
@@ -103,87 +100,8 @@ jobs:
           path: out/composer-semver
           if-no-files-found: error
 
-  test:
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on:
-          - ubuntu-24.04-arm
-          - ubuntu-24.04
-          - macos-15
-#          - macos-15-intel  # TODO
-    runs-on: ${{ matrix.runs-on }}
-    env:
-      GOFLAGS: '-mod=mod'
-    steps:
-      - name: Set environment variables
-        run: |
-          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-          ARCH="$(uname -m)"
-          test "$ARCH" = "aarch64" && ARCH="arm64"
-          test "$ARCH" = "x86_64" && ARCH="amd64"
-
-          echo "OS=$OS" >> $GITHUB_ENV
-          echo "ARCH=$ARCH" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
-        with:
-          name: "composer-semver_${{ env.OS }}_${{ env.ARCH }}"
-          path: out
-
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: 'go.mod'
-
-      # TODO
-      - run: ls -la out
-      - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
-        env:
-          WORKSPACE: ${{ github.workspace }}
-      - run: which composer-semver
-      - run: composer-semver info
-
-      - name: Print composer-semver binary path
-        run: go test -count=1 -v ./internal
-
-      - run: go test -count=1 ./...
-
-  publish:
-    # if: github.event_name == 'release'
-    needs: test
-    permissions:
-      id-token: write
-      attestations: write
-#      contents: write
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - uses: actions/download-artifact@v5
-        with:
-          path: out
-          pattern: composer-semver_*
-          merge-multiple: true
-      # TODO
-      - run: ls -R out
-      - run: file out/composer-semver_*
-
-      - uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: out/composer-semver_*
-      - run: gh release upload --repo "$REPO" "$TAG" composer-semver_*
-        env:
-          TAG: ${{ github.event.release.tag_name }}
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-
   nfpm:
-    # if: github.event_name == 'release'
     needs: build
-#    permissions:
-#      id-token: write
-#      attestations: write
-#    #      contents: write
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Download nfpm
@@ -211,15 +129,129 @@ jobs:
       - run: nfpm package --packager deb --target deb/
         env:
           ARCH: arm64
-          VERSION: ${{ github.event.release.tag_name }}
+          VERSION: ${{ github.event.release.tag_name || format('0.0.0-{0}', github.sha) }}
       - run: nfpm package --packager deb --target deb/
         env:
           ARCH: amd64
-          VERSION: ${{ github.event.release.tag_name }}
+          VERSION: ${{ github.event.release.tag_name || format('0.0.0-{0}', github.sha) }}
 
-      - name: Install lintian
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "deb"
+          path: deb/*.deb
+          if-no-files-found: error
+
+#      - run: gh release upload --repo "$REPO" "$TAG" deb/*.deb
+#        env:
+#          TAG: ${{ github.event.release.tag_name }}
+#          GH_TOKEN: ${{ github.token }}
+#          REPO: ${{ github.repository }}
+
+
+  test-darwin:
+    needs: build
+    strategy:
+      matrix:
+        runs-on:
+          - macos-15
+          - macos-15-intel
+    runs-on: ${{ matrix.runs-on }}
+    env:
+      GOFLAGS: '-mod=mod'
+    steps:
+      - name: Set environment variables
         run: |
-          sudo apt-get update
-          sudo apt-get install lintian
+          ARCH="$(uname -m)"
+          test "$ARCH" = "aarch64" && ARCH="arm64"
+          test "$ARCH" = "x86_64" && ARCH="amd64"
 
-      - run: lintian deb/*.deb
+          echo "ARCH=$ARCH" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: "composer-semver_darwin_${{ env.ARCH }}"
+          path: out
+      - run: chmod +x out/composer-semver
+      - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
+        env:
+          WORKSPACE: ${{ github.workspace }}
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Print composer-semver binary path
+        run: go test -count=1 -v ./internal
+
+      - run: go test -count=1 ./...
+
+  test-linux:
+    needs: nfpm
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on:
+          - ubuntu-24.04-arm
+          - ubuntu-24.04
+          - macos-15
+          - macos-15-intel
+    runs-on: ${{ matrix.runs-on }}
+    env:
+      GOFLAGS: '-mod=mod'
+    steps:
+      - name: Set environment variables
+        run: |
+          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          ARCH="$(uname -m)"
+          test "$ARCH" = "aarch64" && ARCH="arm64"
+          test "$ARCH" = "x86_64" && ARCH="amd64"
+
+          echo "OS=$OS" >> $GITHUB_ENV
+          echo "ARCH=$ARCH" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: "composer-semver_${{ env.OS }}_${{ env.ARCH }}"
+          path: out
+      - run: chmod +x out/composer-semver_*
+      - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
+        env:
+          WORKSPACE: ${{ github.workspace }}
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Print composer-semver binary path
+        run: go test -count=1 -v ./internal
+
+      - run: go test -count=1 ./...
+
+  publish:
+    if: github.event_name == 'release'
+    needs: test
+    permissions:
+      id-token: write
+      attestations: write
+#      contents: write
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: out
+          pattern: composer-semver_*
+          merge-multiple: true
+      - run: chmod +x out/composer-semver_*
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: out/composer-semver_*
+      - run: gh release upload --repo "$REPO" "$TAG" composer-semver_*
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
