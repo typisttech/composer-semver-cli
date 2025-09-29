@@ -102,6 +102,11 @@ jobs:
   nfpm:
     needs: build
     runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        arch:
+          - arm64
+          - amd64
     steps:
       - name: Set environment variables
         run: echo "SEMVER=${TAG#v}" >> $GITHUB_ENV
@@ -125,33 +130,24 @@ jobs:
           sparse-checkout-cone-mode: false
       - uses: actions/download-artifact@v5
         with:
-          pattern: composer-semver_linux_*
+          pattern: composer-semver_linux_${{ matrix.arch }}
           path: dist
+
+      - run: ls -R dist # TODO!
+      - run: ls -R . # TODO!
 
       - run: mkdir -p deb
       - run: nfpm package --packager deb --target "${TARGET}"
         env:
-          ARCH: arm64
-          DIST_DIR: dist/composer-semver_linux_arm64
+          ARCH: ${{ matrix.arch }}
+          DIST_DIR: dist/composer-semver_linux_${{ matrix.arch }}
           VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
-          TARGET: deb/composer-semver_linux_arm64.deb
-      - run: nfpm package --packager deb --target "${TARGET}"
-        env:
-          ARCH: amd64
-          DIST_DIR: dist/composer-semver_linux_amd64
-          VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
-          TARGET: deb/composer-semver_linux_amd64.deb
+          TARGET: deb/composer-semver_linux_${{ matrix.arch }}.deb
 
       - uses: actions/upload-artifact@v4
         with:
-          name: composer-semver_arm64.deb
-          path: deb/composer-semver_linux_arm64.deb
-          if-no-files-found: error
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: composer-semver_amd64.deb
-          path: deb/composer-semver_linux_amd64.deb
+          name: composer-semver_${{ matrix.arch }}.deb
+          path: deb/composer-semver_linux_${{ matrix.arch }}.deb
           if-no-files-found: error
 
   test-linux:
@@ -215,7 +211,7 @@ jobs:
 
       - uses: actions/download-artifact@v5
         with:
-          name: "composer-semver_darwin_${{ env.ARCH }}"
+          name: composer-semver_darwin_${{ env.ARCH }}
           path: out
       - run: |
           echo "${WORKSPACE}/out" >> "$GITHUB_PATH" && \
@@ -232,78 +228,21 @@ jobs:
 
       - run: go test -count=1 ./...
 
-  release-tarball:
-    if: github.ref_type == 'tag'
+  dispatch:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
     needs:
-      - test-darwin
       - test-linux
-    strategy:
-      matrix:
-        os:
-          - darwin
-          - linux
-        arch:
-          - arm64
-          - amd64
-    permissions:
-      id-token: write
-      attestations: write
-      contents: write
+      - test-darwin
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v5
-        with:
-          sparse-checkout: |
-            README.md
-            LICENSE
-          sparse-checkout-cone-mode: false
-      - uses: actions/download-artifact@v5
-        with:
-          name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
-      - run: chmod +x composer-semver
-
       - run: |
-          mkdir -p tarball && \
-          mv composer-semver tarball/composer-semver && \
-          mv README.md tarball/README.md && \
-          mv LICENSE tarball/LICENSE
+          gh workflow run publish.yml \
+          --ref "${REF}" \
+          -f version="${VERSION}" \
+          -f run_id="${RUN_ID}"
 
-      - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-
-      - uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
         env:
-          REPO: ${{ github.repository }}
-          TAG: ${{ github.ref_name }}
-          FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-          GH_TOKEN: ${{ github.token }}
-
-  release-nfpm:
-    if: github.ref_type == 'tag'
-    needs: test-linux
-    permissions:
-      id-token: write
-      attestations: write
-      contents: write
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - uses: actions/download-artifact@v5
-        with:
-          name: composer-semver_arm64.deb
-          path: deb
-      - uses: actions/download-artifact@v5
-        with:
-          name: composer-semver_amd64.deb
-          path: deb
-
-      - uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: deb/*.deb
-      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
-        env:
-          REPO: ${{ github.repository }}
-          TAG: ${{ github.ref_name }}
-          FILE: deb/*.deb
-          GH_TOKEN: ${{ github.token }}
+          REF: ${{ github.ref }}
+          VERSION: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+          GITHUB_TOKEN: ${{ github.token }}
