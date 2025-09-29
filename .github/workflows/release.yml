@@ -55,12 +55,12 @@ jobs:
         with:
           subject-path: deb/*.deb
 
-      - run: ls deb/*.deb | xargs -I {} gh release upload --repo "${REPO}" "${TAG}" {}
+      - run: ls deb/*.deb | xargs -I {} gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {}
         env:
+          CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
           TAG: ${{ inputs.version }}
           GH_TOKEN: ${{ github.token }}
-
 
   tarball:
     needs: drafter
@@ -104,8 +104,9 @@ jobs:
       - uses: actions/attest-build-provenance@v3
         with:
           subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-      - run: gh release upload --repo "${REPO}" "${TAG}" "${FILE}"
+      - run: gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${FILE}"
         env:
+          CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
           TAG: ${{ inputs.version }}
           FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
