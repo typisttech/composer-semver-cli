@@ -1,26 +1,19 @@
 name: Publish
 
 on:
-  workflow_run:
-    workflows:
-      - CI
+  release:
     types:
-      - completed
+      - published
 
-#concurrency:
-#  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
-#  cancel-in-progress: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.release.tag_name }}
+  cancel-in-progress: true
 
 permissions: {}
 
 jobs:
   cloudsmith:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
-#    if: |
-#      github.event.workflow_run.conclusion == 'success' &&
-#      github.event.workflow_run.event == 'push' &&
-#      startsWith(github.event.workflow_run.ref, 'refs/tags/')
     steps:
       - run: ${{ tojson(github) }}
         shell: cat {0}
@@ -28,10 +21,9 @@ jobs:
       - run: ${{ tojson(github.event) }}
         shell: cat {0}
 
-      - run: exit 1
       - run: gh release download --pattern '*.deb' "${TAG}"
         env:
-          TAG: ${{ github.event.workflow_run.event.base_ref }}
+          TAG: ${{ github.event.release.tag_name }}
           GITHUB_TOKEN: ${{ github.token }}
 
       # TODO:
