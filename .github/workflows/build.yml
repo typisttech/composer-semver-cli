@@ -136,6 +136,11 @@ jobs:
 
       # TODO
       - run: ls -R out
+      - run: file "out/composer-semver"
+      - run: file "out/composer-semver_$OS_$ARCH"
+        env:
+          OS: ${{ env.OS }}
+          ARCH: ${{ env.ARCH }}
       - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
         env:
           WORKSPACE: ${{ github.workspace }}
