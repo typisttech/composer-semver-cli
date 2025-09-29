@@ -55,7 +55,7 @@ jobs:
         with:
           subject-path: deb/*.deb
 
-      - run: find deb -type f -name '*.deb' | xargs -I {} gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {}
+      - run: find deb -type f -name '*.deb' -exec  gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {} \;
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
@@ -89,26 +89,41 @@ jobs:
 
       - uses: actions/download-artifact@v5
         with:
-          name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
+          pattern: composer-semver_*_*
+          path: bin
           run-id: ${{ inputs.run_id }}
           github-token: ${{ github.token }}
-      - run: chmod +x composer-semver
+
+      - run: ls -R bin # TODO!
 
       - run: |
-          mkdir -p tarball && \
-          mv composer-semver tarball/composer-semver && \
-          mv README.md tarball/README.md && \
-          mv LICENSE tarball/LICENSE
+          DIRS=$(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0 | \
+          xargs -0P 0 -n1 -- dirname | \
+          xargs -n1 -- basename)
+          
+          echo "DIRS=${DIRS}" >> $GITHUB_ENV
+      - run: echo "${DIRS}" # TODO!
 
-      - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: |
+          for DIR in ${DIRS}; do
+            chmod +x "bin/${DIR}/composer-semver" && \
+            tar -cvf - "bin/${DIR}/composer-semver" README.md LICENSE && \
+            gzip --best - > "tarball/${DIR}.tar.gz" && \
+            
+            tar -ztf "tarball/${DIR}.tar.gz"
+          done
+
+      - run: ls -R tarball # TODO!
 
       - uses: actions/attest-build-provenance@v3
         with:
-          subject-path: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-      - run: gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${FILE}"
+          subject-path: tarball/*.tar.gz
+      - run: |
+          for DIR in ${DIRS}; do
+            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${DIR}.tar.gz"
+          done
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
           TAG: ${{ inputs.version }}
-          FILE: composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
           GH_TOKEN: ${{ github.token }}
