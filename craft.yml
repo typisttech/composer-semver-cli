@@ -5,6 +5,3 @@ sapi:
   - micro
 download-options:
   prefer-pre-built: true
-build-options:
-  with-upx-pack: false
-
