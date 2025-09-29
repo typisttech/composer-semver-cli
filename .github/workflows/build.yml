@@ -165,6 +165,8 @@ jobs:
           merge-multiple: true
       # TODO
       - run: ls -R out
+      - run: file out/composer-semver_*
+
       - uses: actions/attest-build-provenance@v3
         with:
           subject-path: out/composer-semver_*
