@@ -111,9 +111,9 @@ jobs:
       - run: |
           for DIR in ${DIRS}; do
             chmod +x "bin/${DIR}/composer-semver" && \
-            tar -cvf - "bin/${DIR}/composer-semver" README.md LICENSE && \
+            tar -cvf - "bin/${DIR}/composer-semver" README.md LICENSE | \
             gzip --best - > "tarball/${DIR}.tar.gz" && \
-            
+
             tar -ztf "tarball/${DIR}.tar.gz"
           done
 
