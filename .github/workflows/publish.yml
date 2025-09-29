@@ -18,21 +18,18 @@ jobs:
       - run: ${{ tojson(github) }}
         shell: cat {0}
 
-      - run: gh release download --pattern '*.deb' "${TAG}"
+      - run: gh release download --repo "${REPO}" --pattern '*.deb' "${TAG}"
         env:
+          REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ github.token }}
 
       # TODO:
       - run: ls -R .
 
+      - run: find -type f -name '*.deb' . | xargs -I {} gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {}
       - run: gh attestation verify --repo "${REPO}" "${FILE}"
         env:
           REPO: ${{ github.repository }}
           FILE: composer-semver_linux_arm64.deb
-          GITHUB_TOKEN: ${{ github.token }}
-      - run: gh attestation verify --repo "${REPO}" "${FILE}"
-        env:
-          REPO: ${{ github.repository }}
-          FILE: composer-semver_linux_amd64.deb
           GITHUB_TOKEN: ${{ github.token }}
