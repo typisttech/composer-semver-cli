@@ -98,7 +98,7 @@ jobs:
           path: out/composer-semver
           if-no-files-found: error
 
-  deb:
+  nfpm:
     needs: build
     runs-on: ubuntu-24.04-arm
     steps:
@@ -148,7 +148,7 @@ jobs:
           if-no-files-found: error
 
   test-linux:
-    needs: deb
+    needs: nfpm
     strategy:
       matrix:
         runs-on:
@@ -211,7 +211,7 @@ jobs:
           name: "composer-semver_darwin_${{ env.ARCH }}"
           path: out
       - run: |
-          echo "${WORKSPACE}/out" >> "$GITHUB_PATH"
+          echo "${WORKSPACE}/out" >> "$GITHUB_PATH" && \
           chmod +x out/composer-semver
         env:
           WORKSPACE: ${{ github.workspace }}
@@ -260,8 +260,6 @@ jobs:
           mv composer-semver tar/composer-semver && \
           mv README.md tar/README.md && \
           mv LICENSE tar/LICENSE
-
-      - run: ls -R tar
 
       - run: tar -cvf - tar | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
 
