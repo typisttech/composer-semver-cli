@@ -55,7 +55,7 @@ jobs:
         with:
           subject-path: deb/*.deb
 
-      - run: ls deb/*.deb | xargs -I {} gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {}
+      - run: find deb -type f -name '*.deb' | xargs -I {} gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" {}
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
