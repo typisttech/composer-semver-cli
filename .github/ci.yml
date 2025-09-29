@@ -1,4 +1,4 @@
-name: Build
+name: CI
 
 on:
   workflow_dispatch:
@@ -225,7 +225,7 @@ jobs:
 
       - run: go test -count=1 ./...
 
-  release-tar:
+  release-tarball:
 #    if: github.event_name == 'release'
     needs:
       - test-darwin
@@ -256,12 +256,12 @@ jobs:
       - run: chmod +x composer-semver
 
       - run: |
-          mkdir -p tar && \
-          mv composer-semver tar/composer-semver && \
-          mv README.md tar/README.md && \
-          mv LICENSE tar/LICENSE
+          mkdir -p tarball && \
+          mv composer-semver tarball/composer-semver && \
+          mv README.md tarball/README.md && \
+          mv LICENSE tarball/LICENSE
 
-      - run: tar -cvf - tar | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
+      - run: tar -cvf - tarball | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
 
 #      - uses: actions/attest-build-provenance@v3
 #        with:
