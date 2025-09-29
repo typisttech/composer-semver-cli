@@ -96,15 +96,21 @@ jobs:
 
       - run: ls -R bin # TODO!
 
-      - run: echo "BASENAMES=$(find bin -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)" >> $GITHUB_ENV
-
-      - run: echo "${BASENAMES}" # TODO!
+      - run: |
+          DIRS=$(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0 | \
+          xargs -0P 0 -n1 -- dirname | \
+          xargs -n1 -- basename)
+          
+          echo "DIRS=${DIRS}" >> $GITHUB_ENV
+      - run: echo "${DIRS}" # TODO!
 
       - run: |
-          for NAME in ${BASENAMES}; do
-            chmod +x "bin/${NAME}/composer-semver"
-            tar -cvf - tarball "bin/${NAME}/composer-semver" README.md LICENSE | \
-            gzip --best - > "tarball/${NAME}.tar.gz"
+          for DIR in ${DIRS}; do
+            chmod +x "bin/${DIR}/composer-semver" && \
+            tar -cvf - "bin/${DIR}/composer-semver" README.md LICENSE && \
+            gzip --best - > "tarball/${DIR}.tar.gz" && \
+            
+            tar -ztf "tarball/${DIR}.tar.gz"
           done
 
       - run: ls -R tarball # TODO!
@@ -113,8 +119,8 @@ jobs:
         with:
           subject-path: tarball/*.tar.gz
       - run: |
-          for NAME in ${BASENAMES}; do
-            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${NAME}.tar.gz"
+          for DIR in ${DIRS}; do
+            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${DIR}.tar.gz"
           done
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
