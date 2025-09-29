@@ -113,7 +113,6 @@ jobs:
           - ubuntu-24.04
           - macos-15
 #          - macos-15-intel  # TODO
-
     runs-on: ${{ matrix.runs-on }}
     env:
       GOFLAGS: '-mod=mod'
@@ -139,14 +138,12 @@ jobs:
           go-version-file: 'go.mod'
 
       # TODO
-      - run: ls -R out
-      - run: file "out/composer-semver"
-        env:
-          OS: ${{ env.OS }}
-          ARCH: ${{ env.ARCH }}
+      - run: ls -la out
       - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
         env:
           WORKSPACE: ${{ github.workspace }}
+      - run: which composer-semver
+      - run: composer-semver info
 
       - name: Print composer-semver binary path
         run: go test -count=1 -v ./internal
