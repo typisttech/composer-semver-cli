@@ -133,6 +133,9 @@ jobs:
         with:
           name: "composer-semver-${{ env.OS }}-${{ env.ARCH }}"
           path: out
+
+      # TODO
+      - run: ls -R out
       - run: echo "$WORKSPACE/out" >> "$GITHUB_PATH"
         env:
           WORKSPACE: ${{ github.workspace }}
@@ -147,7 +150,7 @@ jobs:
       - run: go test -count=1 ./...
 
   publish:
-    if: github.event_name == 'release'
+    # if: github.event_name == 'release'
     needs: test
     permissions:
       id-token: write
@@ -172,8 +175,8 @@ jobs:
           REPO: ${{ github.repository }}
 
   nfpm:
-    if: github.event_name == 'release'
-    needs: publish
+    # if: github.event_name == 'release'
+    needs: build
 #    permissions:
 #      id-token: write
 #      attestations: write
