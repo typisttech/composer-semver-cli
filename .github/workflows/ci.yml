@@ -213,7 +213,8 @@ jobs:
         with:
           name: composer-semver_darwin_${{ env.ARCH }}
           path: out
-      - run: |
+      - name: Add composer-semver binary to PATH
+        run: |
           echo "${WORKSPACE}/out" >> "$GITHUB_PATH" && \
           chmod +x out/composer-semver
         env:
@@ -237,7 +238,8 @@ jobs:
       actions: write
     runs-on: ubuntu-24.04-arm
     steps:
-      - run: |
+      - name: Dispatch Release Workflow
+        run: |
           gh workflow run release.yml \
             --repo "${REPO}" \
             --ref "${REF}" \
