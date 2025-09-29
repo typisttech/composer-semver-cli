@@ -6,7 +6,7 @@ on:
       - published
 
 concurrency:
-  group: ${{ github.workflow }}--- # TODO -${{ github.event.release.tag_name }}
+  group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 permissions: {}
@@ -18,12 +18,9 @@ jobs:
       - run: ${{ tojson(github) }}
         shell: cat {0}
 
-      - run: ${{ tojson(github.event) }}
-        shell: cat {0}
-
       - run: gh release download --pattern '*.deb' "${TAG}"
         env:
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ github.token }}
 
       # TODO:
