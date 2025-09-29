@@ -3,5 +3,6 @@
   "check-requirements": false,
   "git-tag": "git-tag",
   "git-version": "git-version",
-  "git-commit": "git-commit"
+  "git-commit": "git-commit",
+  "git": "git"
 }

@@ -17,6 +17,7 @@ class InfoCommand extends Command
 {
     private const string GIT_VERSION = '@git-version@';
     private const string GIT_COMMIT = '@git-commit@';
+    private const string GIT = '@git@';
 
     private const BANNER = <<<BANNER
                         ____
@@ -48,6 +49,7 @@ class InfoCommand extends Command
         $io->writeln('GIT_TAG: '. $this->version);
         $io->writeln('GIT_VERSION: '. self::GIT_VERSION);
         $io->writeln('GIT_COMMIT:  '. self::GIT_COMMIT);
+        $io->writeln('GIT: '. self::GIT);
         $io->newLine(2);
 
         $app = sprintf(
