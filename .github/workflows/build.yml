@@ -175,8 +175,11 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: composer-semver_${{ env.ARCH }}.deb
-          path: deb/composer-semver.deb
-      - run: sudo dpkg -i deb/composer-semver.deb
+          path: deb
+      - run: ls -R deb # TODO!
+      - run: sudo dpkg -i "${DEB}"
+        env:
+          DEB: deb/composer-semver_${{ env.ARCH }}.deb
 
       - uses: actions/checkout@v5
 
