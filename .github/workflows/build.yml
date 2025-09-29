@@ -250,18 +250,12 @@ jobs:
             README.md
             LICENSE
           sparse-checkout-cone-mode: false
-
       - uses: actions/download-artifact@v5
         with:
           name: composer-semver_${{ matrix.os }}_${{ matrix.arch }}
-
-      - run: ls -R # TODO!
       - run: chmod +x composer-semver
 
       - run: tar -cvf - . | gzip --best - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}.tar.gz
-      - run: tar -cvf - . | gzip -1 - > composer-semver_${{ matrix.os }}_${{ matrix.arch }}-gzip-1.tar.gz
-
-      - run: ls -sh
 
 #      - uses: actions/attest-build-provenance@v3
 #        with:

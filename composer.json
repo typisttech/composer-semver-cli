@@ -30,7 +30,8 @@
   "require": {
     "php": "~8.4.12",
     "composer/semver": "^3.4",
-    "symfony/console": "^7.3"
+    "symfony/console": "^7.3",
+    "symfony/polyfill-iconv": "^1.33"
   },
   "require-dev": {
     "phpstan/extension-installer": "^1.4",
