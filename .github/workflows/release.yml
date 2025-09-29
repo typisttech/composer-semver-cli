@@ -100,8 +100,12 @@ jobs:
           DIRS=$(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0 | \
           xargs -0P 0 -n1 -- dirname | \
           xargs -n1 -- basename)
-          
-          echo "DIRS=${DIRS}" >> $GITHUB_ENV
+
+          {
+            echo 'DIRS<<EOF'
+            echo "${DIRS}"
+            echo EOF
+          } >> "$GITHUB_ENV"
       - run: echo "${DIRS}" # TODO!
 
       - run: |
