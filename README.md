@@ -3,7 +3,7 @@
 # Composer SemVer CLI
 
 [![GitHub Release](https://img.shields.io/github/v/release/typisttech/composer-semver-cli)](https://github.com/typisttech/composer-semver-cli/releases)
-[![Test](https://github.com/typisttech/composer-semver-cli/actions/workflows/test.yml/badge.svg)](https://github.com/typisttech/composer-semver-cli/actions/workflows/test.yml)
+[![CI](https://github.com/typisttech/composer-semver-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/typisttech/composer-semver-cli/actions/workflows/test.yml)
 [![License](https://img.shields.io/github/license/typisttech/composer-semver-cli.svg)](https://github.com/typisttech/composer-semver-cli/blob/master/LICENSE)
 [![Follow @TangRufus on X](https://img.shields.io/badge/Follow-TangRufus-15202B?logo=x&logoColor=white)](https://x.com/tangrufus)
 [![Follow @TangRufus.com on Bluesky](https://img.shields.io/badge/Bluesky-TangRufus.com-blue?logo=bluesky)](https://bsky.app/profile/tangrufus.com)
