@@ -194,6 +194,18 @@ jobs:
 #    #      contents: write
     runs-on: ubuntu-24.04-arm
     steps:
+      - name: Download nfpm
+        run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*_arm64.deb' --output nfpm.deb
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Install nfpm
+        run: sudo dpkg -i nfpm.deb
+
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            nfpm.yaml
+          sparse-checkout-cone-mode: false
       - uses: actions/download-artifact@v5
         with:
           name: composer-semver_linux_arm64
@@ -202,16 +214,6 @@ jobs:
         with:
           name: composer-semver_linux_amd64
           path: composer-semver_linux_amd64
-      # TODO
-      - run: ls -R .
-
-      - name: Download nfpm
-        run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*_arm64.deb' --output nfpm.deb
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Install nfpm
-        run: sudo dpkg -i nfpm.deb
 
       - run: mkdir -p deb
       - run: nfpm package --packager deb --target deb/
