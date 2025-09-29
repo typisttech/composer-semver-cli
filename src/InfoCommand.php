@@ -44,6 +44,12 @@ class InfoCommand extends Command
         $io->text($bannerRows);
         $io->newLine(2);
 
+        $io->newLine(2);
+        $io->writeln('GIT_TAG: '. $this->version);
+        $io->writeln('GIT_VERSION: '. self::GIT_VERSION);
+        $io->writeln('GIT_COMMIT:  '. self::GIT_COMMIT);
+        $io->newLine(2);
+
         $app = sprintf(
             '%-15s <info>%s</info>',
             $this->name,
