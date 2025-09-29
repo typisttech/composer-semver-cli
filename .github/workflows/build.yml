@@ -216,12 +216,12 @@ jobs:
       - run: mkdir -p deb
       - run: nfpm package --packager deb --target deb/
         env:
-          GOARCH: arm64
-          SEMVER: ${{ github.event.release.tag_name }}
+          ARCH: arm64
+          VERSION: ${{ github.event.release.tag_name }}
       - run: nfpm package --packager deb --target deb/
         env:
-          GOARCH: amd64
-          SEMVER: ${{ github.event.release.tag_name }}
+          ARCH: amd64
+          VERSION: ${{ github.event.release.tag_name }}
 
       - name: Install lintian
         run: sudo apt update && \
