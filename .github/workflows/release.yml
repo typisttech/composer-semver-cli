@@ -37,7 +37,7 @@ jobs:
 
   deb:
     needs: drafter
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       attestations: write
@@ -70,7 +70,7 @@ jobs:
 
   tarball:
     needs: drafter
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       attestations: write

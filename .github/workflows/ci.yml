@@ -19,7 +19,7 @@ permissions: {}
 
 jobs:
   phar:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
         with:
@@ -131,7 +131,7 @@ jobs:
           sparse-checkout-cone-mode: false
       - uses: actions/download-artifact@v5
         with:
-          pattern: composer-semver_Linux_${{ matrix.arch }}
+          pattern: composer-semver_Linux_*
           path: dist
 
       - run: mkdir -p deb
@@ -139,7 +139,8 @@ jobs:
         run: |
           for ARCH in ${ARCHS}; do
             echo "::group::==> ${ARCH}"
-            ARCH="${ARCH}" nfpm package --packager deb --target "deb/composer-semver_Linux_${ARCH}.deb"
+            DIST_DIR="dist/composer-semver_Linux_${ARCH}" \
+              nfpm package --packager deb --target "deb/composer-semver_Linux_${ARCH}.deb"
             echo "::endgroup::"
           done
         env:
@@ -239,7 +240,7 @@ jobs:
       - test-darwin
     permissions:
       actions: write
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     steps:
       - name: Dispatch Release Workflow
         run: |
