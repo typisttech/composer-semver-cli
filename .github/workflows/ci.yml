@@ -56,6 +56,7 @@ jobs:
       - name: Set environment variables
         run: |
           OS="$(uname -s)"
+
           ARCH="$(uname -m)"
           test "${ARCH}" = "aarch64" && ARCH="arm64"
           test "${ARCH}" = "x86_64" && ARCH="amd64"
@@ -64,8 +65,9 @@ jobs:
           echo "ARCH=${ARCH}" >> $GITHUB_ENV
       - name: Set spc environment variables
         run: |
-          test "${OS}" = "Darwin" && SPC_OS="macos" || SPC_OS="${OS}"
-          test "${OS}" = "Linux" && SPC_OS="linux" || SPC_OS="${OS}"
+          SPC_OS="${OS}"
+          test "${OS}" = "Darwin" && SPC_OS="macos"
+          test "${OS}" = "Linux" && SPC_OS="linux"
           test "${ARCH}" = "arm64" && SPC_ARCH="aarch64" || SPC_ARCH="x86_64"
 
           echo "SPC_OS=${SPC_OS}" >> $GITHUB_ENV
