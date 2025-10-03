@@ -17,6 +17,10 @@ concurrency:
 
 permissions: {}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   drafter:
     runs-on: ubuntu-latest
@@ -42,7 +46,7 @@ jobs:
 
       - name: Delete all draft releases
         run: |
-          while release -u3 -r draft_release; do
+          while read -u3 -r draft_release; do
             echo "::group::==> ${draft_release}"
             gh api \
               --method DELETE \

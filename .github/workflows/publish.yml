@@ -11,6 +11,10 @@ concurrency:
 
 permissions: {}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   cloudsmith:
     runs-on: ubuntu-latest
