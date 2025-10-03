@@ -140,7 +140,7 @@ jobs:
           for ARCH in ${ARCHS}; do
             echo "::group::==> ${ARCH}"
             DIST_DIR="dist/composer-semver_Linux_${ARCH}" \
-              nfpm package --packager deb --target "deb/composer-semver_Linux_${ARCH}.deb"
+              ARCH="${ARCH}" nfpm package --packager deb --target "deb/composer-semver_Linux_${ARCH}.deb"
             echo "::endgroup::"
           done
         env:
