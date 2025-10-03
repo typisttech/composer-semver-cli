@@ -24,6 +24,33 @@ jobs:
       contents: write
       pull-requests: read
     steps:
+      - name: List all draft releases
+        run: |
+            echo 'DRAFT_RELEASES<<EOF' >> "$GITHUB_ENV"
+            gh api --paginate \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "/repos/${REPO}/releases" \
+              --jq 'map(select(.draft)) | .[].id'
+            echo EOF >> "$GITHUB_ENV"
+        env:
+          REPO: ${{ github.repository }}
+      - run: echo "${DRAFT_RELEASES}"
+
+      - name: Delete all draft releases
+        run: |
+          while release -u3 -r draft_release; do
+            echo "::group::==> ${draft_release}"
+            gh api \
+              --method DELETE \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "/repos/${REPO}/releases/${draft_release}"
+            echo "::endgroup::"
+          done 3< <(echo "${DRAFT_RELEASES}")
+        env:
+          REPO: ${{ github.repository }}
+
       - uses: release-drafter/release-drafter@v6
         with:
           version: ${{ inputs.version }}
@@ -56,7 +83,7 @@ jobs:
         run: |
           while IFS= read -u3 -r -d '' deb; do 
             echo "::group::==> ${deb}"
-            gh release upload --clobber --repo "${REPO}" "${TAG}" "${deb}"
+            gh release upload --repo "${REPO}" "${TAG}" "${deb}"
             echo "::endgroup::"
           done 3< <(find deb -type f -name '*.deb' -print0)
         env:
@@ -105,7 +132,7 @@ jobs:
 
       - name: Create tarballs
         run: |
-          while read -u3 -r -d '' bin_dir; do
+          while read -u3 -r bin_dir; do
             echo "::group::==> ${bin_dir}"
             cp README.md LICENSE "bin/${bin_dir}/"
             chmod +x "bin/${bin_dir}/composer-semver" && \
@@ -119,7 +146,7 @@ jobs:
 
       - name: Validate tarballs
         run: |
-          while read -u3 -r -d '' bin_dir; do
+          while read -u3 -r bin_dir; do
             echo "::group::==> ${bin_dir}"
             tar -ztf "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
@@ -131,9 +158,9 @@ jobs:
 
       - name: Upload tarballs
         run: |
-          while read -u3 -r -d '' bin_dir; do
+          while read -u3 -r bin_dir; do
             echo "::group::==> ${bin_dir}"
-            gh release upload --clobber --repo "${REPO}" "${TAG}" "tarball/${bin_dir}.tar.gz"
+            gh release upload --repo "${REPO}" "${TAG}" "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
           done 3< <(echo "${BIN_DIRS}")
         env:
