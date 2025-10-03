@@ -176,6 +176,7 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: deb
+          path: deb
 
       - run: ls -R deb # TODO!
 
