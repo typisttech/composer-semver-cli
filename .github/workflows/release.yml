@@ -96,22 +96,15 @@ jobs:
 
       - name: Find binaries
         run: |
-          declare -a bin_dirs
-  
+          echo 'BIN_DIRS<<EOF' >> "$GITHUB_ENV"
           while IFS= read -u3 -r -d '' full_bin_path; do
             echo "::group::==> ${full_bin_path}"
             full_dir=$(dirname "${full_bin_path}")
             dir=$(basename -a "${full_dir}")
-            IFS= bin_dirs+=($dir)
+            echo "${dir}" >> "$GITHUB_ENV"
             echo "::endgroup::"
           done 3< <(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0)
-
-          {
-            echo 'BIN_DIRS<<EOF'
-            echo "${bin_dirs[@]:}"
-            echo EOF
-          } >> "$GITHUB_ENV"
-
+          echo EOF >> "$GITHUB_ENV"
       - run: echo "${BIN_DIRS}"
 
       - run: mkdir -p tarball
