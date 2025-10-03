@@ -106,46 +106,49 @@ jobs:
             echo "::endgroup::"
           done 3< <(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0)
 
-          echo BIN_DIRS=$(IFS=:; echo "${bin_dirs[@]}") >> "$GITHUB_ENV"
+          {
+            echo 'BIN_DIRS<<EOF'
+            echo "${bin_dirs[@]:}"
+            echo EOF
+          } >> "$GITHUB_ENV"
 
-      - run: |
-          echo "Found directories: ${BIN_DIRS[@]}"
+      - run: echo "${BIN_DIRS}"
 
       - run: mkdir -p tarball
 
       - name: Create tarballs
         run: |
-          IFS=: for bin_dir in ${BIN_DIRS[@]}; do
+          while read -u3 -r -d ':' bin_dir; do
             echo "::group::==> ${bin_dir}"
             cp README.md LICENSE "bin/${bin_dir}/"
             chmod +x "bin/${bin_dir}/composer-semver" && \
             tar -C "bin/${bin_dir}" -cvf - composer-semver README.md LICENSE | \
             gzip --best - > "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
-          done
+          done 3< <(echo "${BIN_DIRS}")
 
       # TODO!
       - run: echo "aaa" >> tarball/composer-semver_Linux_amd64.tar.gz
 
       - name: Validate tarballs
         run: |
-          for bin_dir in ${BIN_DIRS[@]}; do
+          while read -u3 -r -d ':' bin_dir; do
             echo "::group::==> ${bin_dir}"
             tar -ztf "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
-          done
+          done 3< <(echo "${BIN_DIRS}")
 
-      - uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: tarball/*.tar.gz
+#      - uses: actions/attest-build-provenance@v3
+#        with:
+#          subject-path: tarball/*.tar.gz
 
       - name: Upload tarballs
         run: |
-          for bin_dir in ${BIN_DIRS[@]}; do
+          while read -u3 -r -d ':' bin_dir; do
             echo "::group::==> ${bin_dir}"
             gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
-          done
+          done 3< <(echo "${BIN_DIRS}")
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
