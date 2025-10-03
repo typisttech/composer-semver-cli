@@ -149,9 +149,6 @@ jobs:
             echo "::endgroup::"
           done 3< <(echo "${BIN_DIRS}")
 
-      # TODO!
-      - run: echo "aaa" >> tarball/composer-semver_Linux_amd64.tar.gz
-
       - name: Validate tarballs
         run: |
           while read -u3 -r bin_dir; do

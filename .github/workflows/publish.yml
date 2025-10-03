@@ -27,9 +27,6 @@ jobs:
           TAG: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ github.token }}
 
-      # TODO:
-      - run: ls -R .
-
       - name: Attestation verification
         run: |
           for arch in ${ARCHS}; do
