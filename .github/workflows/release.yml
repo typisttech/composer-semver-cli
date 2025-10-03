@@ -35,6 +35,7 @@ jobs:
             echo EOF >> "$GITHUB_ENV"
         env:
           REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
       - run: echo "${DRAFT_RELEASES}"
 
       - name: Delete all draft releases
@@ -50,6 +51,7 @@ jobs:
           done 3< <(echo "${DRAFT_RELEASES}")
         env:
           REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
 
       - uses: release-drafter/release-drafter@v6
         with:
