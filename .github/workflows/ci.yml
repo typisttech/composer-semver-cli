@@ -150,14 +150,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: composer-semver_arm64.deb
-          path: deb/composer-semver_Linux_arm64.deb
-          if-no-files-found: error
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: composer-semver_amd64.deb
-          path: deb/composer-semver_Linux_amd64.deb
+          name: deb
+          path: deb/*.deb
           if-no-files-found: error
 
   test-linux:
@@ -181,8 +175,10 @@ jobs:
 
       - uses: actions/download-artifact@v5
         with:
-          name: composer-semver_${{ env.ARCH }}.deb
-          path: deb
+          name: deb
+
+      - run: ls -R deb # TODO!
+
       - run: sudo dpkg -i "${DEB}"
         env:
           DEB: deb/composer-semver_Linux_${{ env.ARCH }}.deb
