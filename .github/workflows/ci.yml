@@ -150,8 +150,14 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: composer-semver_${{ matrix.arch }}.deb
-          path: deb/composer-semver_Linux_${{ matrix.arch }}.deb
+          name: composer-semver_arm64.deb
+          path: deb/composer-semver_Linux_arm64.deb
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: composer-semver_amd64.deb
+          path: deb/composer-semver_Linux_amd64.deb
           if-no-files-found: error
 
   test-linux:
