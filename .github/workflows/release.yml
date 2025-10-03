@@ -10,9 +10,6 @@ on:
         description: 'ID of the CI workflow run that created the release assets'
         type: number
         required: true
-      clobber:
-        description: 'Overwrite existing assets of the same name'
-        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.version }}
@@ -61,11 +58,10 @@ jobs:
         run: |
           while IFS= read -u3 -r -d '' deb; do 
             echo "::group::==> ${deb}"
-            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${deb}"
+            gh release upload --clobber --repo "${REPO}" "${TAG}" "${deb}"
             echo "::endgroup::"
           done 3< <(find deb -type f -name '*.deb' -print0)
         env:
-          CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
           TAG: ${{ inputs.version }}
           GH_TOKEN: ${{ github.token }}
@@ -131,19 +127,18 @@ jobs:
             echo "::endgroup::"
           done 3< <(echo "${BIN_DIRS}")
 
-#      - uses: actions/attest-build-provenance@v3
-#        with:
-#          subject-path: tarball/*.tar.gz
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: tarball/*.tar.gz
 
       - name: Upload tarballs
         run: |
           while read -u3 -r -d ':' bin_dir; do
             echo "::group::==> ${bin_dir}"
-            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${bin_dir}.tar.gz"
+            gh release upload --clobber --repo "${REPO}" "${TAG}" "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
           done 3< <(echo "${BIN_DIRS}")
         env:
-          CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
           TAG: ${{ inputs.version }}
           GH_TOKEN: ${{ github.token }}
