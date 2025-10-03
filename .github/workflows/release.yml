@@ -26,13 +26,15 @@ jobs:
     steps:
       - name: List all draft releases
         run: |
-            echo 'DRAFT_RELEASES<<EOF' >> "$GITHUB_ENV"
+          {
+            echo 'DRAFT_RELEASES<<EOF'
             gh api --paginate \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               "/repos/${REPO}/releases" \
               --jq 'map(select(.draft)) | .[].id'
-            echo EOF >> "$GITHUB_ENV"
+            echo EOF
+          } >> "$GITHUB_ENV"
         env:
           REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
