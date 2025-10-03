@@ -81,7 +81,7 @@ jobs:
           echo "SPC_ARCH=${spc_arch}" >> $GITHUB_ENV
       - run: echo "${SPC_ARCH}"
 
-      - name: Download spc
+      - name: Install spc
         run: |
           gh release download --repo crazywhalecc/static-php-cli --pattern "${PATTERN}" --output spc.tar.gz && \
           mkdir -p /tmp/spc && \
