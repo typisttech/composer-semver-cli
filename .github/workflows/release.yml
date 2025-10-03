@@ -96,11 +96,11 @@ jobs:
         run: |
           declare -a DIRS
   
-          while IFS= read -u3 -r -d '' COM; do
-            echo "::group::==> ${COM}"
-            d=$(dirname "${COM}")
-            b=$(basename -a "${d}")
-            IFS= DIRS+=($b)
+          while IFS= read -u3 -r -d '' FULL_BIN_PATH; do
+            echo "::group::==> ${FULL_BIN_PATH}"
+            full_dir=$(dirname "${FULL_BIN_PATH}")
+            dir=$(basename -a "${full_dir}")
+            IFS= DIRS+=($dir)
             echo "::endgroup::"
           done 3< <(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0)
 

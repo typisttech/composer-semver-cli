@@ -26,13 +26,13 @@ jobs:
       # TODO:
       - run: ls -R .
 
-      - run: gh attestation verify --repo "${REPO}" "${FILE}"
+      - name: Attestation verification
+        run: |
+          for ARCH in ${ARCHS}; do
+            echo "::group::==> ${ARCH}"
+            gh attestation verify --repo "${REPO}" "composer-semver_Linux_${ARCH}.deb"
+            echo "::endgroup::"
+          done
         env:
           REPO: ${{ github.repository }}
-          FILE: composer-semver_Linux_arm64.deb
-          GITHUB_TOKEN: ${{ github.token }}
-      - run: gh attestation verify --repo "${REPO}" "${FILE}"
-        env:
-          REPO: ${{ github.repository }}
-          FILE: composer-semver_Linux_amd64.deb
-          GITHUB_TOKEN: ${{ github.token }}
+          ARCHS: "arm64 amd64"
