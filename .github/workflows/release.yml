@@ -123,6 +123,9 @@ jobs:
             echo "::endgroup::"
           done
 
+      - run: echo "aaa" >> tarball/composer-semver_Linux_amd64.tar.gz
+      - run: echo "aaa" >> tarball/composer-semver_Darwin_amd64.tar.gz
+
       - name: Validate tarballs
         run: |
           for DIR in ${DIRS[@]}; do

@@ -136,7 +136,7 @@ jobs:
           sparse-checkout-cone-mode: false
       - uses: actions/download-artifact@v5
         with:
-          pattern: composer-semver_linux_${{ matrix.arch }}
+          pattern: composer-semver_Linux_${{ matrix.arch }}
           path: dist
 
       - run: mkdir -p deb
@@ -145,12 +145,12 @@ jobs:
           ARCH: ${{ matrix.arch }}
           DIST_DIR: dist
           VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
-          TARGET: deb/composer-semver_linux_${{ matrix.arch }}.deb
+          TARGET: deb/composer-semver_Linux_${{ matrix.arch }}.deb
 
       - uses: actions/upload-artifact@v4
         with:
           name: composer-semver_${{ matrix.arch }}.deb
-          path: deb/composer-semver_linux_${{ matrix.arch }}.deb
+          path: deb/composer-semver_Linux_${{ matrix.arch }}.deb
           if-no-files-found: error
 
   test-linux:
