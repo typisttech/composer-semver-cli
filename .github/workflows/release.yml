@@ -57,12 +57,11 @@ jobs:
 
       - name: Upload debs
         run: |
-          DEBS=$(find deb -type f -name '*.deb')
-          for DEB in ${DEBS}; do
+          while IFS= read -u3 -r -d '' DEB; do 
             echo "::group::==> ${DEB}"
             gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${DEB}"
             echo "::endgroup::"
-          done
+          done 3< <(find deb -type f -name '*.deb' -print0)
         env:
           CLOBBER: ${{ inputs.clobber && '--clobber' || '' }}
           REPO: ${{ github.repository }}
@@ -95,9 +94,15 @@ jobs:
 
       - name: Find binaries
         run: |
-          DIRS=$(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0 | \
-          xargs -0P 0 -n1 -- dirname | \
-          xargs -n1 -- basename)
+          declare -a DIRS
+  
+          while IFS= read -u3 -r -d '' COM; do
+            echo "::group::==> ${COM}"
+            d=$(dirname "${COM}")
+            b=$(basename -a "${d}")
+            IFS= DIRS+=($b)
+            echo "::endgroup::"
+          done 3< <(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0)
 
           {
             echo 'DIRS<<EOF'
@@ -105,11 +110,11 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
+      - run: mkdir -p tarball
+
       - name: Create tarballs
         run: |
-          mkdir -p tarball
-          
-          for DIR in ${DIRS}; do
+          for DIR in ${DIRS[@]}; do
             echo "::group::==> ${DIR}"
             cp README.md LICENSE "bin/${DIR}/"
             chmod +x "bin/${DIR}/composer-semver" && \
@@ -120,7 +125,7 @@ jobs:
 
       - name: Validate tarballs
         run: |
-          for DIR in ${DIRS}; do
+          for DIR in ${DIRS[@]}; do
             echo "::group::==> ${DIR}"
             tar -ztf "tarball/${DIR}.tar.gz"
             echo "::endgroup::"
@@ -132,7 +137,7 @@ jobs:
 
       - name: Upload tarballs
         run: |
-          for DIR in ${DIRS}; do
+          for DIR in ${DIRS[@]}; do
             echo "::group::==> ${DIR}"
             gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${DIR}.tar.gz"
             echo "::endgroup::"
