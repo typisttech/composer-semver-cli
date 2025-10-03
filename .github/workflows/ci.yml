@@ -49,8 +49,8 @@ jobs:
         runs-on:
           - ubuntu-24.04-arm
           - ubuntu-24.04
-          - macos-15
-          - macos-15-intel
+#          - macos-15
+#          - macos-15-intel
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Set environment variables
@@ -108,11 +108,6 @@ jobs:
   nfpm:
     needs: build
     runs-on: ubuntu-24.04-arm
-    strategy:
-      matrix:
-        arch:
-          - arm64
-          - amd64
     steps:
       - name: Set environment variables
         run: echo "SEMVER=${TAG#v}" >> $GITHUB_ENV
@@ -140,12 +135,14 @@ jobs:
           path: dist
 
       - run: mkdir -p deb
-      - run: nfpm package --packager deb --target "${TARGET}"
+      - run: |
+          for ARCH in ${ARCHS}; do
+            nfpm package --packager deb --target "deb/composer-semver_Linux_${ARCH}.deb"
+          done
         env:
-          ARCH: ${{ matrix.arch }}
           DIST_DIR: dist
           VERSION: ${{ env.SEMVER || format('0.0.0-{0}+{1}', github.run_number, github.sha) }}
-          TARGET: deb/composer-semver_Linux_${{ matrix.arch }}.deb
+          ARCHS: "arm64 amd64"
 
       - uses: actions/upload-artifact@v4
         with:
