@@ -47,10 +47,11 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: deb
+          path: deb
           run-id: ${{ inputs.run_id }}
           github-token: ${{ github.token }}
 
-      - run: ls -R deb # TODO!
+      - run: ls -R . # TODO!
 
       - uses: actions/attest-build-provenance@v3
         with:
@@ -58,9 +59,9 @@ jobs:
 
       - name: Upload debs
         run: |
-          while IFS= read -u3 -r -d '' DEB; do 
-            echo "::group::==> ${DEB}"
-            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${DEB}"
+          while IFS= read -u3 -r -d '' deb; do 
+            echo "::group::==> ${deb}"
+            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "${deb}"
             echo "::endgroup::"
           done 3< <(find deb -type f -name '*.deb' -print0)
         env:
@@ -95,32 +96,31 @@ jobs:
 
       - name: Find binaries
         run: |
-          declare -a DIRS
+          declare -a bin_dirs
   
-          while IFS= read -u3 -r -d '' FULL_BIN_PATH; do
-            echo "::group::==> ${FULL_BIN_PATH}"
-            full_dir=$(dirname "${FULL_BIN_PATH}")
+          while IFS= read -u3 -r -d '' full_bin_path; do
+            echo "::group::==> ${full_bin_path}"
+            full_dir=$(dirname "${full_bin_path}")
             dir=$(basename -a "${full_dir}")
-            IFS= DIRS+=($dir)
+            IFS= bin_dirs+=($dir)
             echo "::endgroup::"
           done 3< <(find bin -maxdepth 2 -mindepth 2 -type f -name 'composer-semver' -print0)
 
-          {
-            echo 'DIRS<<EOF'
-            echo "${DIRS}"
-            echo EOF
-          } >> "$GITHUB_ENV"
+          echo BIN_DIRS=$(IFS=:; echo "${bin_dirs[@]}") >> "$GITHUB_ENV"
+
+      - run: |
+          echo "Found directories: ${BIN_DIRS[@]}"
 
       - run: mkdir -p tarball
 
       - name: Create tarballs
         run: |
-          for DIR in ${DIRS[@]}; do
-            echo "::group::==> ${DIR}"
-            cp README.md LICENSE "bin/${DIR}/"
-            chmod +x "bin/${DIR}/composer-semver" && \
-            tar -C "bin/${DIR}" -cvf - composer-semver README.md LICENSE | \
-            gzip --best - > "tarball/${DIR}.tar.gz"
+          IFS=: for bin_dir in ${BIN_DIRS[@]}; do
+            echo "::group::==> ${bin_dir}"
+            cp README.md LICENSE "bin/${bin_dir}/"
+            chmod +x "bin/${bin_dir}/composer-semver" && \
+            tar -C "bin/${bin_dir}" -cvf - composer-semver README.md LICENSE | \
+            gzip --best - > "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
           done
 
@@ -129,9 +129,9 @@ jobs:
 
       - name: Validate tarballs
         run: |
-          for DIR in ${DIRS[@]}; do
-            echo "::group::==> ${DIR}"
-            tar -ztf "tarball/${DIR}.tar.gz"
+          for bin_dir in ${BIN_DIRS[@]}; do
+            echo "::group::==> ${bin_dir}"
+            tar -ztf "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
           done
 
@@ -141,9 +141,9 @@ jobs:
 
       - name: Upload tarballs
         run: |
-          for DIR in ${DIRS[@]}; do
-            echo "::group::==> ${DIR}"
-            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${DIR}.tar.gz"
+          for bin_dir in ${BIN_DIRS[@]}; do
+            echo "::group::==> ${bin_dir}"
+            gh release upload ${CLOBBER} --repo "${REPO}" "${TAG}" "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
           done
         env:

@@ -53,25 +53,33 @@ jobs:
           - macos-15-intel
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - name: Set environment variables
+      - name: Set OS environment variable
+        run: echo OS="$(uname -s)" >> $GITHUB_ENV
+      - run: echo "${OS}"
+
+      - name: Set ARCH environment variable
         run: |
-          OS="$(uname -s)"
+          arch="$(uname -m)"
+          test "${arch}" = "aarch64" && arch="arm64"
+          test "${arch}" = "x86_64" && arch="amd64"
+          echo ARCH="${arch}" >> $GITHUB_ENV
+      - run: echo "$ARCH"
 
-          ARCH="$(uname -m)"
-          test "${ARCH}" = "aarch64" && ARCH="arm64"
-          test "${ARCH}" = "x86_64" && ARCH="amd64"
-
-          echo "OS=${OS}" >> $GITHUB_ENV
-          echo "ARCH=${ARCH}" >> $GITHUB_ENV
-      - name: Set spc environment variables
+      - name: Set SPC_OS environment variable
         run: |
-          SPC_OS="${OS}"
-          test "${OS}" = "Darwin" && SPC_OS="macos"
-          test "${OS}" = "Linux" && SPC_OS="linux"
-          test "${ARCH}" = "arm64" && SPC_ARCH="aarch64" || SPC_ARCH="x86_64"
+          spc_os="${OS}"
+          test "${OS}" = "Darwin" && spc_os="macos"
+          test "${OS}" = "Linux" && spc_os="linux"
+          echo SPC_OS="${spc_os}" >> $GITHUB_ENV
+      - run: echo "${SPC_OS}"
 
-          echo "SPC_OS=${SPC_OS}" >> $GITHUB_ENV
-          echo "SPC_ARCH=${SPC_ARCH}" >> $GITHUB_ENV
+      - name: Set SPC_ARCH environment variable
+        run: |
+          spc_arch="${ARCH}"
+          test "${spc_arch}" = "arm64" && spc_arch="aarch64"
+          test "${spc_arch}" = "amd64" && spc_arch="x86_64"
+          echo "SPC_ARCH=${spc_arch}" >> $GITHUB_ENV
+      - run: echo "${SPC_ARCH}"
 
       - name: Download spc
         run: |
@@ -109,11 +117,12 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04-arm
     steps:
-      - name: Set environment variables
-        run: echo "SEMVER=${TAG#v}" >> $GITHUB_ENV
+      - name: Set SEMVER environment variable
+        run: echo SEMVER="${TAG#v}" >> $GITHUB_ENV
         env:
           TAG: ${{ github.ref_name }}
         if: github.ref_type == 'tag'
+      - run: echo "${SEMVER}"
 
       - name: Download nfpm
         run: gh release download --repo goreleaser/nfpm --pattern 'nfpm_*_arm64.deb' --output nfpm.deb
@@ -137,10 +146,10 @@ jobs:
       - run: mkdir -p deb
       - name: Creates packages
         run: |
-          for ARCH in ${ARCHS}; do
-            echo "::group::==> ${ARCH}"
-            DIST_DIR="dist/composer-semver_Linux_${ARCH}" \
-              ARCH="${ARCH}" nfpm package --packager deb --target "deb/composer-semver_Linux_${ARCH}.deb"
+          for arch in ${ARCHS}; do
+            echo "::group::==> ${arch}"
+            DIST_DIR="dist/composer-semver_Linux_${arch}" \
+            ARCH="${arch}" nfpm package --packager deb --target "deb/composer-semver_Linux_${arch}.deb"
             echo "::endgroup::"
           done
         env:
@@ -165,22 +174,20 @@ jobs:
     env:
       GOFLAGS: '-mod=mod'
     steps:
-      - name: Set environment variables
+      - name: Set ARCH environment variable
         run: |
-          ARCH="$(uname -m)"
-          test "${ARCH}" = "aarch64" && ARCH="arm64"
-          test "${ARCH}" = "x86_64" && ARCH="amd64"
-
-          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+          arch="$(uname -m)"
+          test "${arch}" = "aarch64" && arch="arm64"
+          test "${arch}" = "x86_64" && arch="amd64"
+          echo ARCH="${arch}" >> $GITHUB_ENV
+      - run: echo "$ARCH"
 
       - uses: actions/download-artifact@v5
         with:
           name: deb
           path: deb
 
-      - run: sudo dpkg -i "${DEB}"
-        env:
-          DEB: deb/composer-semver_Linux_${{ env.ARCH }}.deb
+      - run: sudo dpkg -i "deb/composer-semver_Linux_${ARCH}.deb"
 
       - uses: actions/checkout@v5
 
@@ -204,13 +211,13 @@ jobs:
     env:
       GOFLAGS: '-mod=mod'
     steps:
-      - name: Set environment variables
+      - name: Set ARCH environment variable
         run: |
-          ARCH="$(uname -m)"
-          test "${ARCH}" = "aarch64" && ARCH="arm64"
-          test "${ARCH}" = "x86_64" && ARCH="amd64"
-
-          echo "ARCH=${ARCH}" >> $GITHUB_ENV
+          arch="$(uname -m)"
+          test "${arch}" = "aarch64" && arch="arm64"
+          test "${arch}" = "x86_64" && arch="amd64"
+          echo ARCH="${arch}" >> $GITHUB_ENV
+      - run: echo "$ARCH"
 
       - uses: actions/checkout@v5
 
@@ -218,10 +225,12 @@ jobs:
         with:
           name: composer-semver_Darwin_${{ env.ARCH }}
           path: out
+
+      - name: Grant composer-semver binary execute permission
+        run: chmod +x out/composer-semver
+
       - name: Add composer-semver binary to PATH
-        run: |
-          echo "${WORKSPACE}/out" >> "$GITHUB_PATH" && \
-          chmod +x out/composer-semver
+        run: echo "${WORKSPACE}/out" >> "$GITHUB_PATH"
         env:
           WORKSPACE: ${{ github.workspace }}
 

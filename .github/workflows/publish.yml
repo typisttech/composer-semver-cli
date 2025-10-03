@@ -28,9 +28,9 @@ jobs:
 
       - name: Attestation verification
         run: |
-          for ARCH in ${ARCHS}; do
-            echo "::group::==> ${ARCH}"
-            gh attestation verify --repo "${REPO}" "composer-semver_Linux_${ARCH}.deb"
+          for arch in ${ARCHS}; do
+            echo "::group::==> ${arch}"
+            gh attestation verify --repo "${REPO}" "composer-semver_Linux_${arch}.deb"
             echo "::endgroup::"
           done
         env:
