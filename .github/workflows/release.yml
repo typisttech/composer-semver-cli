@@ -48,8 +48,6 @@ jobs:
           run-id: ${{ inputs.run_id }}
           github-token: ${{ github.token }}
 
-      - run: ls -R . # TODO!
-
       - uses: actions/attest-build-provenance@v3
         with:
           subject-path: deb/*.deb
@@ -107,7 +105,7 @@ jobs:
 
       - name: Create tarballs
         run: |
-          while read -u3 -r -d ':' bin_dir; do
+          while read -u3 -r -d '' bin_dir; do
             echo "::group::==> ${bin_dir}"
             cp README.md LICENSE "bin/${bin_dir}/"
             chmod +x "bin/${bin_dir}/composer-semver" && \
@@ -121,7 +119,7 @@ jobs:
 
       - name: Validate tarballs
         run: |
-          while read -u3 -r -d ':' bin_dir; do
+          while read -u3 -r -d '' bin_dir; do
             echo "::group::==> ${bin_dir}"
             tar -ztf "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
@@ -133,7 +131,7 @@ jobs:
 
       - name: Upload tarballs
         run: |
-          while read -u3 -r -d ':' bin_dir; do
+          while read -u3 -r -d '' bin_dir; do
             echo "::group::==> ${bin_dir}"
             gh release upload --clobber --repo "${REPO}" "${TAG}" "tarball/${bin_dir}.tar.gz"
             echo "::endgroup::"
