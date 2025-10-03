@@ -178,7 +178,7 @@ jobs:
           path: deb
       - run: sudo dpkg -i "${DEB}"
         env:
-          DEB: deb/composer-semver_linux_${{ env.ARCH }}.deb
+          DEB: deb/composer-semver_Linux_${{ env.ARCH }}.deb
 
       - uses: actions/checkout@v5
 
@@ -214,7 +214,7 @@ jobs:
 
       - uses: actions/download-artifact@v5
         with:
-          name: composer-semver_darwin_${{ env.ARCH }}
+          name: composer-semver_Darwin_${{ env.ARCH }}
           path: out
       - name: Add composer-semver binary to PATH
         run: |
