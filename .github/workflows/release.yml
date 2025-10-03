@@ -46,8 +46,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v5
         with:
-          pattern: '*.deb'
-          path: deb
+          name: deb
           run-id: ${{ inputs.run_id }}
           github-token: ${{ github.token }}
 
